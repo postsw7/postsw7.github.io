@@ -18,37 +18,20 @@ body {
 }
 
 a {
-  color: #0bc;
+  color: #4285f4;
   text-decoration: none;
 }
 
-#a {
-  color: #0f0;
+#sudo {
+  color: #00ffa6;
 }
 
-#c {
-  color: #0bc;
-}
-
-#b {
+#tilde {
   color: #ff0096;
 }
 
-#k {
-  animation: change 1s;
-}
-
-#op {
-  color: #888888;
-}
-
-@keyframes change {
-  0% {
-    color: #0f0;
-  }
-  50% {
-    color: #0f0;
-  }
+#dollar {
+  color: #fff292;
 }
 
 .cursor {

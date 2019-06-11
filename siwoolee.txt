@@ -1,7 +1,7 @@
-      <span id="a">Siwoo@Lee</span>:<span id="b">~</span
-      ><span id="c">$</span> cd SiwooLee/About_Me <br />
-      <span id="a">Siwoo@Lee</span>:<span id="b">~</span
-      ><span id="c">$</span> cat siwoolee.txt<br /><br />
+      <span id="sudo">Siwoo@Lee</span>:<span id="tilde">~</span
+      ><span id="dollar">$</span> cd SiwooLee/About_Me <br />
+      <span id="sudo">Siwoo@Lee</span>:<span id="tilde">~</span
+      ><span id="dollar">$</span> cat siwoolee.txt<br /><br />
 
       Hey There! I am Siwoo Lee, a Javascript Engineer from South Korea.
 
