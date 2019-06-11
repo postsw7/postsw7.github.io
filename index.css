@@ -14,7 +14,7 @@ body {
 }
 
 .block {
-  display: inline-block;
+  display: inline;
 }
 
 a {
