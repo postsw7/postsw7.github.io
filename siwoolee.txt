@@ -3,7 +3,7 @@
       <span id="sudo">Siwoo@Lee</span>:<span id="tilde">~</span
       ><span id="dollar">$</span> cat siwoolee.txt<br /><br />
 
-      Hey There! I am Siwoo Lee, a Javascript Engineer from South Korea.
+      Hello! I am Siwoo Lee, a Javascript Engineer from South Korea.
 
       <br /><br /><p class="block">I am a passionate and supportive team player dedicated to streamlining processes and efficiently
         resolving project issues. Willing to do whatever it takes to help the team succeed: mostly front end, but also back end
@@ -13,11 +13,11 @@
 
       <br /><br /><p class="block">
         I was the only frontend engineer in the previous development team, and what I built from scratch was an e-commerce platform for the online sale of clothing and accessories and allows
-users to conduct their online shopping by comparing prices across all of its partner stores <br /> Please check the website I created => <a
+users to conduct their online shopping by comparing prices across all of its partner stores. <br /><br /> Please check the website I created => <a
           href="https://www.lookpin.co.kr"
         >
           Lookpin
-        </a>.
+        </a>
       </p>
 
       <br /><br /><p class="block">
