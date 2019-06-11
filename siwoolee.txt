@@ -5,13 +5,13 @@
 
       Hey There! I am Siwoo Lee, a Javascript Engineer from South Korea.
 
-      <p>I am a passionate and supportive team player dedicated to streamlining processes and efficiently
+      <br /><br /><p class="block">I am a passionate and supportive team player dedicated to streamlining processes and efficiently
         resolving project issues. Willing to do whatever it takes to help the team succeed: mostly front end, but also back end
         and everything in between.</p>
 
-      <p>I have worked in the frontend web development using HTML, CSS, Javascript, and React along with other frontend technologies. I also have professional experience working with jQuery, Redux, Ruby on Rails, SASS.</p>
+      <p class="block">I have worked in the frontend web development using HTML, CSS, Javascript, and React along with other frontend technologies. I also have professional experience working with jQuery, Redux, Ruby on Rails, SASS.</p>
 
-      <p>
+      <br /><br /><p class="block">
         I have worked as the only frontend engineer in the previous development team, and what I built from scratch was an e-commerce platform for the online sale of clothing and accessories and allows
 users to conduct their online shopping by comparing prices across all of its partner stores <a
           href="https://www.lookpin.co.kr"
@@ -20,7 +20,7 @@ users to conduct their online shopping by comparing prices across all of its par
         </a>.
       </p>
 
-      <p>
+      <br /><br /><p class="block">
         You can check my other profiles, here: <br />
         <a href="https://www.linkedin.com/in/siwoolee/">LinkedIn</a> <br />
         <a href="https://github.com/postsw7">Github</a> and <br />
@@ -34,4 +34,4 @@ users to conduct their online shopping by comparing prices across all of its par
         >postsw7@gmail.com</a
       >.
 
-      <p>Cheers!</p>
+      <br /><br /><p class="block">Cheers!</p>
