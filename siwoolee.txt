@@ -15,6 +15,7 @@
         I was the only frontend engineer in the previous development team, and what I built from scratch was an e-commerce platform for the online sale of clothing and accessories and allows
 users to conduct their online shopping by comparing prices across all of its partner stores. <br /><br /> Please check the website I created => <a
           href="https://www.lookpin.co.kr"
+          target="_blank"
         >
           Lookpin
         </a>
@@ -22,9 +23,9 @@ users to conduct their online shopping by comparing prices across all of its par
 
       <br /><br /><p class="block">
         You can check my other profiles, here: <br />
-        <a href="https://www.linkedin.com/in/siwoolee/">LinkedIn</a> <br />
-        <a href="https://github.com/postsw7">Github</a> and <br />
-        <a href="#">Resume</a>.
+        <a href="https://www.linkedin.com/in/siwoolee/" target="_blank">LinkedIn</a> <br />
+        <a href="https://github.com/postsw7" target="_blank">Github</a> and <br />
+        <a href="https://drive.google.com/file/d/1KJOa1roms-1TSyGNhXwMjDZ7BgPzedGv/view?usp=sharing" target="_blank">Resume</a>.
       </p><br /><br />
 
       I am currently seeking new opportunities in Toronto,
