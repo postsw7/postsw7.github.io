@@ -2,38 +2,36 @@
       ><span id="c">$</span> cd SiwooLee/About_Me <br />
       <span id="a">Siwoo@Lee</span>:<span id="b">~</span
       ><span id="c">$</span> cat siwoolee.txt<br /><br />
-      My favorite code quote, "<span id="k">Quote you like</span>".
 
-      Hey There! This is the portflio website in the skin of a terminal.<!-- laglaglaglaglaglaglaglaglaglaglaglag -->
-      <p>You can see that, this is how your portfolio would look like.</p>
-      <p>You can introduce yourself here.</p>
-      <!-- bitlagbitlagbitlagbitlagbitlagbitlag -->
+      Hey There! I am Siwoo Lee, a Javascript Engineer from South Korea.
+
+      <p>I am a passionate and supportive team player dedicated to streamlining processes and efficiently
+        resolving project issues. Willing to do whatever it takes to help the team succeed: mostly front end, but also back end
+        and everything in between.</p>
+
+      <p>I have worked in the frontend web development using HTML, CSS, Javascript, and React along with other frontend technologies. I also have professional experience working with jQuery, Redux, Ruby on Rails, SASS.</p>
+
       <p>
-        You can also tell what you've worked and known and what skills you have,
-        you can also give link to your professional portfolio here<a
-          href="link"
+        I have worked as the only frontend engineer in the previous development team, and what I built from scratch was an e-commerce platform for the online sale of clothing and accessories and allows
+users to conduct their online shopping by comparing prices across all of its partner stores <a
+          href="https://www.lookpin.co.kr"
         >
-          portfolio</a
-        >.
-      </p>
-      <!-- delaydelaydelaydelaydelaydelaydelay -->
-      <p>
-        Tell more about yourself. <br /><br /><br />Give your project links or
-        something like that. <a href="link"> Here you go</a>.
-      </p>
-      <!-- moredelaymoredelaymoredelaymoredelaymoredelaymoredelay-->
-      <p>
-        You can give links to other professional profiles you have on Internet,
-        here: <br />
-        <a href="link1">Profile1</a> <br />
-        <a href="link2">Profile2</a> and <br />
-        <a href="link3">Profile3</a>.
+          Lookpin
+        </a>.
       </p>
 
-      You can also give your email ID for contacting you<!-- slightdelayhere-->,
-      feel free to send me an email at<!-- longlonglongcomment --><a
-        href="Your email ID"
-        >Email</a
+      <p>
+        You can check my other profiles, here: <br />
+        <a href="https://www.linkedin.com/in/siwoolee/">LinkedIn</a> <br />
+        <a href="https://github.com/postsw7">Github</a> and <br />
+        <a href="#">Resume</a>.
+      </p>
+
+      I am currently seeking new opportunities in Toronto,
+      if you are IT recruiter or someone who just would like to get in touch, feel free to email me at
+      <a
+        href="mailto: postsw7@gmail.com"
+        >postsw7@gmail.com</a
       >.
 
       <p>Cheers!</p>
