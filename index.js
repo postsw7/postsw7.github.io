@@ -35,6 +35,6 @@ function autoType(element, typingSpeed) {
 $(function() {
   $.get(file, function(data) {
     wholeText = data;
-    autoType('.terminal', 10);
+    autoType('.terminal', 20);
   });
 });
