@@ -12,8 +12,8 @@
       <br /><br /><p class="block">I have worked in the frontend web development using HTML, CSS, Javascript, and React along with other frontend technologies. I also have professional experience working with jQuery, Redux, Ruby on Rails, SASS.</p>
 
       <br /><br /><p class="block">
-        I have worked as the only frontend engineer in the previous development team, and what I built from scratch was an e-commerce platform for the online sale of clothing and accessories and allows
-users to conduct their online shopping by comparing prices across all of its partner stores <a
+        I was the only frontend engineer in the previous development team, and what I built from scratch was an e-commerce platform for the online sale of clothing and accessories and allows
+users to conduct their online shopping by comparing prices across all of its partner stores <br /> Please check the website I created => <a
           href="https://www.lookpin.co.kr"
         >
           Lookpin
@@ -28,7 +28,7 @@ users to conduct their online shopping by comparing prices across all of its par
       </p><br /><br />
 
       I am currently seeking new opportunities in Toronto,
-      if you are IT recruiter or someone who just would like to get in touch, feel free to email me at
+      if you are IT recruiter or someone who would just like to talk, feel free to email me at
       <a
         href="mailto: postsw7@gmail.com"
         >postsw7@gmail.com</a
