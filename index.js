@@ -32,10 +32,9 @@ function autoType(element, typingSpeed) {
   }, 1500);
 }
 
-$.get(file, function(data) {
-  wholeText = data;
-});
-
 $(function() {
-  autoType('.terminal', 20);
+  $.get(file, function(data) {
+    wholeText = data;
+    autoType('.terminal', 20);
+  });
 });
