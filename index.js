@@ -1,5 +1,6 @@
 const file = 'siwoolee.txt';
 let wholeText = '';
+let timeoutList = [];
 
 function updateCursor(that, cont) {
   if (that.html()[that.html().length - 1] === '|') {
@@ -22,11 +23,13 @@ function autoType(element, typingSpeed) {
     $el.text('');
     for (var i = 0; i < amntOfChars; i++) {
       (function(i, char) {
-        setTimeout(function() {
-          newString += char;
-          $el.html(newString);
-          updateCursor($el, newString);
-        }, i * typingSpeed);
+        timeoutList.push(
+          setTimeout(function() {
+            newString += char;
+            $el.html(newString);
+            updateCursor($el, newString);
+          }, i * typingSpeed)
+        );
       })(i + 1, text[i]);
     }
   }, 1500);
@@ -41,8 +44,18 @@ $(function() {
   $('#switch').on('click', () => {
     if ($('#switch').prop('checked')) {
       $('body').removeClass('light');
+      $('.skip-btn').removeClass('light');
     } else {
       $('body').addClass('light');
+      $('.skip-btn').addClass('light');
     }
+  });
+
+  $('.skip-btn').on('click', () => {
+    console.log(timeoutList);
+    for (let i = 0; i < timeoutList.length; i++) {
+      clearTimeout(timeoutList[i]);
+    }
+    $('.typewriter').html(wholeText);
   });
 });

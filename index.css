@@ -81,10 +81,8 @@ a {
 
 .wrapper {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   transition: 1s all ease;
-  width: 100%;
-  height: 100vh;
 }
 
 #switch:checked ~ .switch-label {
@@ -105,4 +103,29 @@ a {
 .light {
   background: #f7f7f7;
   transition: 1s all ease;
+}
+
+button {
+  padding: 5px 10px;
+  border: none;
+  text-align: center;
+  background: #f7f7f7;
+  font-size: 18px;
+  font-style: italic;
+  text-decoration: none;
+  color: #181b23;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+  transition: all 0.7s cubic-bezier(0.25, 0.8, 0.25, 1);
+  outline: 0;
+  cursor: pointer;
+}
+
+button:hover {
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+}
+
+.skip-btn.light {
+  color: #f7f7f7;
+  background-color: #181b23;
+  transition: all 0.7s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
