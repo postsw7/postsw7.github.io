@@ -22,12 +22,21 @@
     <title>Siwoo Lee</title>
     <link rel="stylesheet" type="text/css" href="index.css" />
     <script
-      type="text/javascript"
-      src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"
+      src="https://code.jquery.com/jquery-3.4.1.min.js"
+      integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+      crossorigin="anonymous"
     ></script>
   </head>
   <body>
     <script type="text/javascript" src="index.js"></script>
-    <div class="terminal"><div class="typewriter"></div></div>
+    <div class="terminal">
+      <div class="wrapper">
+        <input type="checkbox" id="switch" checked />
+        <label for="switch" class="switch-label">
+          <div class="toggle"></div>
+        </label>
+      </div>
+      <div class="typewriter"></div>
+    </div>
   </body>
 </html>

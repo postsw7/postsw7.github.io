@@ -37,4 +37,12 @@ $(function() {
     wholeText = data;
     autoType('.terminal', 20);
   });
+
+  $('#switch').on('click', () => {
+    if ($('#switch').prop('checked')) {
+      $('body').removeClass('light');
+    } else {
+      $('body').addClass('light');
+    }
+  });
 });
