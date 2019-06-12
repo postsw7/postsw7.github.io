@@ -62,8 +62,8 @@ a {
   align-items: center;
   width: 100px;
   height: 30px;
-  border: 1px solid #ccc;
   border-radius: 50px;
+  background-color: #181b23;
   position: relative;
   cursor: pointer;
   transition: 0.5s all ease;
@@ -73,7 +73,7 @@ a {
   width: 25px;
   height: 25px;
   border-radius: 25px;
-  background-color: #ff0096;
+  background-color: #ddc986;
   position: absolute;
   left: 3px;
   transition: 0.5s all ease;
@@ -88,7 +88,7 @@ a {
 }
 
 #switch:checked ~ .switch-label {
-  background: #ff0096;
+  background: #f7f7f7;
   border: none;
   transition: 0.5s all ease;
 }
@@ -97,7 +97,7 @@ a {
   height: 12.5px;
   border-radius: 25px 25px 0 0;
   background: transparent;
-  box-shadow: 0 -6px 0 0 #fff;
+  box-shadow: 0 -7px 0 0 #fbc01a;
   transform: scale(0.9) translateX(75px) rotate(90deg);
   transition: 0.7s all ease;
 }
