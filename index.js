@@ -52,10 +52,12 @@ $(function() {
   });
 
   $('.skip-btn').on('click', () => {
-    console.log(timeoutList);
-    for (let i = 0; i < timeoutList.length; i++) {
-      clearTimeout(timeoutList[i]);
+    if (timeoutList.length) {
+      for (let i = 0; i < timeoutList.length; i++) {
+        clearTimeout(timeoutList[i]);
+      }
+      timeoutList = [];
+      $('.typewriter').html(wholeText);
     }
-    $('.typewriter').html(wholeText);
   });
 });

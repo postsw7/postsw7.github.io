@@ -14,6 +14,10 @@ body {
   line-height: 1.3em;
 }
 
+body.light .terminal {
+  color: #181b23;
+}
+
 .block {
   display: inline;
 }
@@ -27,12 +31,20 @@ a {
   color: #00ffa6;
 }
 
+body.light #sudo {
+  color: #1a858c;
+}
+
 #tilde {
   color: #ff0096;
 }
 
 #dollar {
   color: #fff292;
+}
+
+body.light #dollar {
+  color: #fbc01a;
 }
 
 .cursor {
@@ -80,6 +92,7 @@ a {
 }
 
 .wrapper {
+  margin-bottom: 30px;
   display: flex;
   justify-content: space-between;
   transition: 1s all ease;
@@ -105,7 +118,7 @@ a {
   transition: 1s all ease;
 }
 
-button {
+.skip-btn {
   padding: 5px 10px;
   border: none;
   text-align: center;
@@ -120,7 +133,7 @@ button {
   cursor: pointer;
 }
 
-button:hover {
+.skip-btn:hover {
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
 }
 
