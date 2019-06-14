@@ -119,28 +119,17 @@ body.light #dollar {
 }
 
 .skip-btn {
+  height: 30px;
   padding: 5px 10px;
   border: none;
   text-align: center;
-  background: #f7f7f7;
   font-size: 18px;
   font-style: italic;
   text-decoration: none;
-  color: #181b23;
+  color: #f7f7f7;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
-  transition: all 0.7s cubic-bezier(0.25, 0.8, 0.25, 1);
   outline: 0;
   cursor: pointer;
-}
-
-.skip-btn:hover {
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
-}
-
-.skip-btn.light {
-  color: #f7f7f7;
-  background-color: #181b23;
-  transition: all 0.7s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 .typewriter {
@@ -167,7 +156,6 @@ body.light #dollar {
 
 .terminal-header.light ~ .typewriter {
   background-color: #fdf9f3;
-  /* border: 1px solid #d6d6d6; */
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
   color: #0a0a0a;
   transition: all 0.7s cubic-bezier(0.25, 0.8, 0.25, 1);
@@ -192,4 +180,38 @@ body.light #dollar {
 
 .green {
   background-color: #3bb662;
+}
+
+.btn-3d {
+  position: relative;
+  display: inline-block;
+  font-size: 16px;
+  padding: 5px 20px;
+  margin: 0px 10px 0 5px;
+  border-radius: 6px;
+  text-align: center;
+  transition: top 0.01s linear;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.15);
+}
+
+.btn-3d:active {
+  top: 9px;
+}
+
+.btn-3d.pastelblue {
+  background-color: #8babb7;
+  box-shadow: 0 0 0 1px rgb(139, 171, 183) inset,
+    0 0 0 2px rgba(255, 255, 255, 0.15) inset,
+    0 8px 0 0 rgba(139, 171, 183, 0.7), 0 8px 0 1px rgba(0, 0, 0, 0.4),
+    0 8px 8px 1px rgba(0, 0, 0, 0.5);
+}
+
+.btn-3d.pastelblue:hover {
+  background-color: #7b97a2;
+  text-shadow: 0px 0px 6px rgba(255, 255, 255, 1);
+}
+
+.btn-3d.pastelblue:active {
+  box-shadow: 0 0 0 1px #8babb7 inset, 0 0 0 2px rgba(255, 255, 255, 0.15) inset,
+    0 0 0 1px rgba(0, 0, 0, 0.4);
 }
