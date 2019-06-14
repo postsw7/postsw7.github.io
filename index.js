@@ -18,7 +18,7 @@ function autoType(element, typingSpeed) {
   var newString = '';
   $el.append('<span class="cursor">|</span>');
   setTimeout(function() {
-    $el.css('opacity', 1);
+    $el.css('opacity', 0.8);
     $el.prev().removeAttr('style');
     $el.text('');
     for (var i = 0; i < amntOfChars; i++) {
@@ -45,9 +45,11 @@ $(function() {
     if ($('#switch').prop('checked')) {
       $('body').removeClass('light');
       $('.skip-btn').removeClass('light');
+      $('.terminal-header').removeClass('light');
     } else {
       $('body').addClass('light');
       $('.skip-btn').addClass('light');
+      $('.terminal-header').addClass('light');
     }
   });
 

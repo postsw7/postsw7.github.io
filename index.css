@@ -142,3 +142,54 @@ body.light #dollar {
   background-color: #181b23;
   transition: all 0.7s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
+
+.typewriter {
+  min-height: 630px;
+  padding: 7px;
+  background-color: #181b23;
+  border-radius: 0 0 10px 10px;
+  color: #e6e6e6;
+  opacity: 0.8;
+  transition: all 0.7s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.terminal-header {
+  background-color: #d9e4ef;
+  height: 30px;
+  border-radius: 8px 8px 0 0;
+  padding-left: 10px;
+}
+
+.terminal-header.light {
+  background-color: #f1f1f1;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+}
+
+.terminal-header.light ~ .typewriter {
+  background-color: #fdf9f3;
+  /* border: 1px solid #d6d6d6; */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+  color: #0a0a0a;
+  transition: all 0.7s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.terminal-header .btn {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  margin-top: 10px;
+  margin-right: -2px;
+  border-radius: 8px;
+}
+
+.red {
+  background-color: #e75448;
+}
+
+.yellow {
+  background-color: #e5c30f;
+}
+
+.green {
+  background-color: #3bb662;
+}
