@@ -60,4 +60,12 @@ $(function() {
       $('.typewriter').html(wholeText);
     }
   });
+
+  $('.skip-btn').hover(e => {
+    if (e.type === 'mouseenter') {
+      $('.cover').addClass('is-hover');
+    } else if (e.type === 'mouseleave') {
+      $('.cover').removeClass('is-hover');
+    }
+  });
 });
