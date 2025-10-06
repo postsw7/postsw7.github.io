@@ -13,17 +13,19 @@ export interface RecruiterData {
 export const RECRUITER: RecruiterData = {
   name: 'Siwoo Lee — Software Engineer',
   location: 'Toronto, ON, Canada',
-  experience: '6+ years experience',
-  tagline: 'Frontend specialist • Full-stack capable',
+  experience: '7+ years experience',
+  tagline: 'Full-stack engineer • AWS Cloud & DevOps automation',
   highlights: [
-    'Built complete e-commerce platform from scratch as sole frontend engineer',
-    'Expert in React, JavaScript, Ruby on Rails, AWS (ECS, RDS, S3)',
-    'Created Lookpin - price comparison shopping platform',
+    'Led org-wide security infrastructure overhaul; integrated AWS Identity Center for unified auth.',
+    'Modernized CI/CD with GitHub Actions & ECS; maintained legacy Ansible automation sustainably.',
+    'Migrated legacy S3/SES integrations to AWS SDK with IAM-based auth.',
+    'Developed Strapi-based CMS (Aurora MySQL, Docker, DeepL) — enabled non-dev updates 7× faster.',
+    'Built & launched full-featured e-commerce web app (React, Redux, JS) as the sole front-end engineer.',
   ],
   links: [
-    { label: '📄 Resume', url: RESUME_URL, type: 'resume' },
-    { label: '💼 LinkedIn', url: LINK_ALIASES.linkedin, type: 'linkedin' },
-    { label: '💻 GitHub', url: LINK_ALIASES.github, type: 'github' },
-    { label: '✉️ Email', url: 'mailto:postsw7@gmail.com', type: 'email' },
+    { label: 'Resume', url: RESUME_URL, type: 'resume' },
+    { label: 'LinkedIn', url: LINK_ALIASES.linkedin, type: 'linkedin' },
+    { label: 'GitHub', url: LINK_ALIASES.github, type: 'github' },
+    { label: 'Email', url: 'mailto:postsw7@gmail.com', type: 'email' },
   ],
 }

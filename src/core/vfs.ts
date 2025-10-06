@@ -9,7 +9,7 @@ export const FS: Directory = {
     'about.md': `# About Me\n\nToronto-based Software Engineer. Building AWS/ECS/RDS-backed web apps.`,
     'skills.md': `# Skills\n\nFrontend: React, JS, Redux, jQuery\nBackend: Rails, Node.js\nCloud: AWS (ECS, RDS, S3)`,
     'experience.md': `# Experience\n\nSole frontend engineer for Lookpin. Built e-commerce from scratch.`,
-    'contact.md': `# Contact\n\nEmail: postsw7@gmail.com\nLinkedIn: https://www.linkedin.com/in/siwoolee\nGitHub: https://github.com/postsw7`,
+    'contact.md': `# Contact\n\nEmail: postsw7@gmail.com\nLinkedIn: https://www.linkedin.com/in/siwoolee/\nGitHub: https://github.com/postsw7`,
   },
   projects: {
     jgrep: {
