@@ -53,7 +53,8 @@ export function CLI(): JSX.Element {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  useEffect(() => { outputEndRef.current?.scrollIntoView({ behavior: 'smooth' }) }, [output])
+  // Scroll to bottom when output grows OR when suggestions panel size changes (e.g., Tab autocomplete)
+  useEffect(() => { outputEndRef.current?.scrollIntoView({ behavior: 'smooth' }) }, [output, suggestions])
   useEffect(() => { try { (globalThis as any).__CLI_CWD__ = cwd } catch (e) { /* ignore */ } }, [cwd])
   useEffect(() => { const h = () => inputRef.current?.focus(); document.addEventListener('click', h); return () => document.removeEventListener('click', h) }, [])
 
