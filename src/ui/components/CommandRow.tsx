@@ -13,7 +13,7 @@ export function CommandRow({ theme, item }: Props) {
           <span className={theme.accent}>{item.prompt}</span>
         </div>
         <div className="w-0 h-0 border-y-[12px] border-y-transparent border-l-[12px] border-l-[#2b2f3a]"></div>
-        <span className="ml-2 truncate">{item.content}</span>
+        <span className="ml-2 truncate !overflow-visible">{item.content}</span>
       </div>
       {item.meta && (
         <div className="flex items-center gap-0 shrink-0">
