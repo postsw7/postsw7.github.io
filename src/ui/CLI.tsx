@@ -10,6 +10,7 @@ import { FS, list as vfsList, read as vfsRead, normalizePath, getNode, isDir, pa
 import { getCompletionCandidates, applyCompletion } from './autocomplete'
 import { CommandRow } from './components/CommandRow'
 import { ActivePrompt } from './components/ActivePrompt'
+import { Banner } from './components/Banner'
 
 // Basic types for output items
 interface CommandMeta { status: Status; branch: string; time: string }
@@ -40,16 +41,16 @@ export function CLI(): JSX.Element {
 
   // Track visit + welcome
   useEffect(() => {
-  trackVisit()
-  try { (globalThis as any).__CLI_CWD__ = cwd } catch (e) { /* no-op */ }
+    trackVisit()
+
+    try { (globalThis as any).__CLI_CWD__ = cwd } catch (e) { /* no-op */ }
+
     addOutput({ type: 'output', content: (
       <div className="space-y-2">
-        <div className="text-lg font-bold text-[#00ffa6]">Welcome to Siwoo Lee&apos;s Portfolio! 🚀</div>
-        <div>Type <span className="text-[#00ffa6]">help</span> to see available commands.</div>
-        <div className="text-sm text-gray-400">Tip: Use ↑↓ for history, Tab for autocomplete, Ctrl+C to cancel</div>
+        <Banner />
       </div>
     ) })
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => { outputEndRef.current?.scrollIntoView({ behavior: 'smooth' }) }, [output])
