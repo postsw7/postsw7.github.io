@@ -7,11 +7,11 @@ export interface LinkAliases {
 
 export interface DemoSpec { key: string; name: string; desc: string }
 
-export const RESUME_URL: string = 'https://drive.google.com/file/d/1KJOa1roms-1TSyGNhXwMjDZ7BgPzedGv/view'
+export const RESUME_URL: string = 'https://drive.google.com/file/d/1EFuRm4YJsGxEkVarX2jsISmjD3otkJA3/view'
 
 export const LINK_ALIASES: LinkAliases = {
   github: 'https://github.com/postsw7',
-  linkedin: 'https://www.linkedin.com/in/siwoolee',
+  linkedin: 'https://www.linkedin.com/in/siwoolee/',
   resume: RESUME_URL,
 }
 

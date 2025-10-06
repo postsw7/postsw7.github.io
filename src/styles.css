@@ -27,3 +27,9 @@
   -ms-user-select: none;
   user-select: none;
 }
+
+@layer utilities {
+  .center-flex {
+    @apply flex items-center justify-center;
+  }
+}

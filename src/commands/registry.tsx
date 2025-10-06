@@ -5,6 +5,20 @@ import { trackRecruiterView, trackResumeOpen, trackOpen } from '../core/analytic
 import { RESUME_URL, LINK_ALIASES, DEMOS } from '../core/constants'
 import { HELP_SECTIONS, HELP_FOOTER } from '../core/helpData'
 import { RECRUITER } from '../core/recruiterData'
+import { Github, Linkedin, Mail, FileText, Link2, HighlighterIcon, MapPin, Hourglass, Workflow, UserRound } from "lucide-react"
+
+const FILE_ICONS: Record<string, React.ReactNode> = {
+  'github': <Github size={16} className="inline-block w-4 h-4 mr-1 text-gray-300" />,
+  'linkedin': <Linkedin size={16} className="inline-block w-4 h-4 mr-1 text-gray-300" />,
+  'email': <Mail size={16} className="inline-block w-4 h-4 mr-1 text-gray-300" />,
+  'resume': <FileText size={16} className="inline-block w-4 h-4 mr-1 text-gray-300" />,
+  'link': <Link2 size={16} className="inline-block w-4 h-4 mr-1 text-gray-300" />,
+  'highlight': <HighlighterIcon size={18} className="inline-block w-4 h-4 mr-1 text-gray-300" strokeWidth={2.5}/>,
+  'location': <MapPin className="inline-block w-4 h-4 mr-1 text-gray-300" />,
+  'experience': <Hourglass className="inline-block w-4 h-4 mr-1 text-gray-300" />,
+  'tagline': <Workflow className="inline-block w-4 h-4 mr-1 text-gray-300" strokeWidth={2.25}/>,
+  'profile': <UserRound size={22} className="inline-block mr-1 text-gray-300" />,
+}
 
 export interface CommandContextApi {
   echo: (output: React.ReactNode) => void
@@ -140,7 +154,7 @@ export function createRegistry(api: CommandContextApi, _currentPrompt: string): 
       desc: 'Show social links',
       handler: () => (
         <div className="space-y-1">
-          <div><span className="text-[#00ffa6]">linkedin</span> → https://www.linkedin.com/in/siwoolee</div>
+          <div><span className="text-[#00ffa6]">linkedin</span> → https://www.linkedin.com/in/siwoolee/</div>
           <div><span className="text-[#00ffa6]">github</span> → https://github.com/postsw7</div>
           <div><span className="text-[#00ffa6]">email</span> → postsw7@gmail.com</div>
         </div>
@@ -169,29 +183,42 @@ function HelpRenderer() {
 
 function RecruiterCard() {
   return (
-    <div className="border border-[#00ffa6] rounded-lg p-6 max-w-2xl space-y-4 bg-[#1a1f2a]">
-      <div className="text-xl font-bold text-[#00ffa6]">{RECRUITER.name}</div>
+    <div className="border border-[#00ffa6]/30 rounded-lg p-6 max-w-2xl space-y-4 bg-[#1a1f2a]">
+      <div className="text-xl font-bold text-[#00ffa6]">
+        <div className="center-flex justify-self-start">{FILE_ICONS['profile']} <span>{RECRUITER.name}</span></div>
+      </div>
       <div className="space-y-2 text-sm">
-        <div>📍 <span className="text-gray-300">{RECRUITER.location}</span></div>
-        <div>💼 <span className="text-gray-300">{RECRUITER.experience}</span></div>
-        <div>🎯 <span className="text-gray-300">{RECRUITER.tagline}</span></div>
+        <div>{FILE_ICONS['location']} <span className="text-gray-300">{RECRUITER.location}</span></div>
+        <div>{FILE_ICONS['experience']} <span className="text-gray-300">{RECRUITER.experience}</span></div>
+        <div>{FILE_ICONS['tagline']} <span className="text-gray-300">{RECRUITER.tagline}</span></div>
       </div>
       <div className="pt-3 border-t border-gray-700">
-        <div className="text-[#fff292] mb-2">Key Highlights:</div>
-        <ul className="text-sm space-y-1 ml-4">{RECRUITER.highlights.map(h => <li key={h}>• {h}</li>)}</ul>
+        <div className="text-[#fff292] mb-2">{FILE_ICONS['highlight']} Key Highlights:</div>
+        <ul className="text-sm space-y-1 ml-4 text-gray-400">{RECRUITER.highlights.map(h => <li key={h}>• {h}</li>)}</ul>
       </div>
       <div className="pt-3 border-t border-gray-700 space-y-2">
-        <div className="text-[#fff292]">Quick Links:</div>
+        <div className="text-[#fff292]">{FILE_ICONS['link']} Quick Links:</div>
         <div className="flex flex-wrap gap-3 text-sm">
           {RECRUITER.links.map((l, i) => (
             <React.Fragment key={l.type}>
               {i !== 0 && <span className="text-gray-600">|</span>}
-              <a href={l.url} target={l.url.startsWith('http') ? '_blank' : undefined} rel="noopener noreferrer" onClick={() => { if (l.type === 'resume') trackResumeOpen() }} className="text-[#4285f4] hover:underline cursor-pointer">{l.label}</a>
+              <a
+                href={l.url}
+                target={l.url.startsWith('http') ? '_blank' : undefined}
+                rel="noopener noreferrer"
+                onClick={() => { if (l.type === 'resume') trackResumeOpen() }}
+                className="text-[#4285f4] hover:underline cursor-pointer center-flex"
+              >
+                {FILE_ICONS[l.type]}
+                {l.label}
+              </a>
             </React.Fragment>
           ))}
         </div>
       </div>
-  <div className="pt-3 text-xs text-gray-500">Type &apos;skills&apos; or &apos;experience&apos; for more details</div>
+      <div className="pt-3 text-xs text-gray-500">
+        See more details in <span className="text-[#44D39F]">Resume</span> or <span className="text-[#44D39F]">LinkedIn</span>.
+      </div>
     </div>
   )
 }
