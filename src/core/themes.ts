@@ -19,7 +19,7 @@ export const THEMES: Record<string, Theme> = {
     bg: 'bg-[#30353a]',
     terminalBg: 'bg-[#181b23]',
     headerBg: 'bg-[#d9e4ef]',
-    fg: 'text-[#ffffff]',
+    fg: 'text-[#989ea8]',
     accent: 'text-[#00b2ff]',
     secondary: 'text-[#ff0096]',
     tertiary: 'text-[#fff292]',
