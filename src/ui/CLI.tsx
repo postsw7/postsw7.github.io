@@ -440,11 +440,9 @@ export function CLI(): JSX.Element {
               <div ref={outputEndRef} />
             </div>
           </div>
-          <div className="mt-4 text-center text-sm text-gray-500">
-            <span>Built with React + Vite + Tailwind</span>
-            <span className="mx-2">·</span>
-            <a href="https://github.com/postsw7" target="_blank" rel="noopener noreferrer" className="hover:text-[#00ffa6] transition-colors">GitHub</a>
-          </div>
+          <footer className="mt-4 text-center text-sm text-gray-500">
+            <a href="https://github.com/postsw7/postsw7.github.io" target="_blank" rel="noopener noreferrer" className="hover:text-[#00ffa6] transition-colors">GitHub</a>
+          </footer>
         </div>
       </div>
     )
