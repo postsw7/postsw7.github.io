@@ -33,3 +33,11 @@ export function trackAutocomplete(prefix: string, candidatesCount: number): void
 export function trackOpen(url: string): void { track('open', { url, timestamp: Date.now() }) }
 export function trackRecruiterView(): void { track('recruiter_view', { timestamp: Date.now() }) }
 export function trackResumeOpen(): void { track('resume_open', { timestamp: Date.now() }) }
+
+// Demo specific analytics
+export function trackDemoStart(name: string): void { track('demo_start', { name, ts: Date.now() }) }
+export function trackDemoCommand(name: string, argv: string[], elapsedMs?: number): void {
+  track('demo_cmd', { name, argv: argv.join(' '), ms: elapsedMs, ts: Date.now() })
+}
+export function trackDemoStep(name: string, step: number): void { track('demo_step', { name, step, ts: Date.now() }) }
+export function trackDemoError(name: string, error: string): void { track('demo_error', { name, error, ts: Date.now() }) }

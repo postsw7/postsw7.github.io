@@ -20,6 +20,27 @@ let ready = false
 let versionTag: string | null = null
 const pending = new Map<string, Pending>()
 
+// Simple pub/sub for progress events so UI can display load diagnostics
+type ProgressEvent = { stage: string; detail?: string; attempt?: number }
+type ProgressListener = (evt: ProgressEvent) => void
+
+const progressListeners = new Set<ProgressListener>()
+
+export function onJgrepProgress(fn: ProgressListener) {
+  progressListeners.add(fn)
+  return () => progressListeners.delete(fn)
+}
+
+function emitProgress(evt: ProgressEvent) {
+  progressListeners.forEach(listener => {
+    try {
+      listener(evt)
+    } catch {
+      /* ignore */
+    }
+  })
+}
+
 function genId(): string { return Math.random().toString(36).slice(2) }
 
 async function fetchVersion(): Promise<string | null> {
@@ -41,6 +62,12 @@ export async function ensureWorker(): Promise<void> {
       const msg = ev.data
       if (msg?.type === 'ready') {
         ready = true
+        // Surface a unified progress event so UI can stop spinner
+        emitProgress({ stage: 'ready', detail: msg.pyVersion })
+        return
+      }
+      if (msg?.type === 'progress') {
+        emitProgress({ stage: msg.stage, detail: msg.detail, attempt: msg.attempt })
         return
       }
       if (msg?.type === 'result') {
@@ -66,20 +93,16 @@ export async function ensureWorker(): Promise<void> {
       console.error('Worker error', e)
     }
   }
-  // Wait until ready message or timeout after 8s
+  // Wait until ready message or timeout after 10s
   await new Promise<void>((resolve, reject) => {
     const start = Date.now()
-    const max = 20000 // 20s for initial Pyodide load on slower networks
+    const max = 10000
     const interval = setInterval(() => {
       if (ready) { clearInterval(interval); resolve() }
-      if (Date.now() - start > max) { clearInterval(interval); reject(new Error('jgrep runtime load timeout (exceeded 20s)')) }
-      // Expose transient readiness for debugging
-      try { (globalThis as any).__JGREP_READY__ = ready } catch { /* noop */ }
+      if (Date.now() - start > max) { clearInterval(interval); reject(new Error('jgrep runtime load timeout (10s)')) }
     }, 150)
   })
 }
-
-export function isJgrepReady(): boolean { return ready }
 
 export async function runJgrep(argv: string[]): Promise<JgrepResult> {
   await ensureWorker()
