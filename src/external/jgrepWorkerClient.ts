@@ -104,6 +104,8 @@ export async function ensureWorker(): Promise<void> {
   })
 }
 
+export function isJgrepReady(): boolean { return ready }
+
 export async function runJgrep(argv: string[]): Promise<JgrepResult> {
   await ensureWorker()
   if (!worker) throw new Error('worker missing')
