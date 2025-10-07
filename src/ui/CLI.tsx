@@ -6,6 +6,8 @@ import { getTheme } from '../core/themes'
 import { tokenize, hasTrailingSpace } from '../core/tokenize'
 import { trackVisit, trackCommand, trackUnknownCommand } from '../core/analytics'
 import { createRegistry } from '../commands/registry'
+import { runJgrep, ensureWorker, isJgrepReady } from '../external/jgrepWorkerClient'
+import { trackDemoError } from '../core/analytics'
 import { FS, list as vfsList, read as vfsRead, normalizePath, getNode, isDir, pathLabel } from '../core/vfs'
 import { getCompletionCandidates, applyCompletion } from './autocomplete'
 import { CommandRow } from './components/CommandRow'
@@ -258,6 +260,61 @@ export function CLI(): JSX.Element {
       addOutput({ type: 'output', content: <pre className="whitespace-pre-wrap">{content}</pre> })
       finalizeCommand(commandId, 'ok')
       return 'ok'
+    }
+
+    // External jgrep command passthrough
+    if (cmdName === 'jgrep') {
+      try {
+        if (!isJgrepReady()) {
+          addOutput({ type: 'info', content: 'Initializing Python runtime (Pyodide) — this may take a few seconds the first time...' })
+          // Fire and forget ensureWorker to allow early fetch; runJgrep will also call it but this starts sooner.
+          ensureWorker().catch(() => {/* handled below if runJgrep fails */})
+        }
+        const result = await runJgrep([cmdName, ...args])
+        if (result.format === 'lines') {
+          addOutput({ type: 'output', content: <pre className="whitespace-pre-wrap">{result.lines.join('\n')}</pre> })
+        } else if (result.format === 'pretty') {
+          addOutput({ type: 'output', content: <pre className="whitespace-pre">{result.blocks.join('\n')}</pre> })
+        } else if (result.format === 'json') {
+          addOutput({ type: 'output', content: <pre className="whitespace-pre-wrap">{JSON.stringify(result.data, null, 2)}</pre> })
+        } else if (result.format === 'table') {
+          // Simple column width compute
+          const widths = result.header.map((h, i) => Math.max(h.length, ...result.rows.map(r => (r[i] || '').length)))
+          const pad = (v: string, i: number) => v + ' '.repeat(widths[i] - v.length)
+          const lines = [result.header.map(pad).join('  '), ...result.rows.map(r => r.map(pad).join('  '))]
+          addOutput({ type: 'output', content: <pre className="whitespace-pre">{lines.join('\n')}</pre> })
+        } else if (result.format === 'tokens') {
+          addOutput({ type: 'output', content: (
+            <div className="space-y-1">
+              {result.lines.map((line, idx) => (
+                <div key={idx} className="whitespace-pre-wrap">
+                  {line.map((tok, i) => {
+                    const base = 'font-mono'
+                    let cls = ''
+                    switch (tok.t) {
+                      case 'match': cls = 'text-[#00ffa6] font-semibold'; break
+                      case 'key': cls = 'text-cyan-300'; break
+                      case 'value': cls = 'text-pink-300'; break
+                      case 'number': cls = 'text-amber-300'; break
+                      case 'string': cls = 'text-green-300'; break
+                      case 'errorHighlight': cls = 'bg-red-700 text-white px-0.5 rounded'; break
+                      default: cls = 'text-gray-300'; break
+                    }
+                    return <span key={i} className={`${base} ${cls}`}>{tok.v}</span>
+                  })}
+                </div>
+              ))}
+            </div>
+          ) })
+        }
+        finalizeCommand(commandId, 'ok')
+        return 'ok'
+      } catch (err: any) {
+        trackDemoError('jgrep', err?.message || 'unknown')
+        addOutput({ type: 'error', content: err?.message || 'jgrep: error: unknown failure' })
+        finalizeCommand(commandId, 'err')
+        return 'err'
+      }
     }
 
     const cmd = (commands as any)[cmdName]
