@@ -9,7 +9,7 @@ export const HELP_SECTIONS: HelpSection[] = [
       { cmd: 'clear', desc: 'Clear the terminal' },
       { cmd: 'pwd', desc: 'Print current directory' },
       { cmd: 'ls [path]', desc: 'List directory entries' },
-      { cmd: 'cd <path>', desc: 'Change directory (try: cd profile)' },
+      { cmd: 'cd <path>', desc: 'Change directory (use cd .. for parent, Tab to drill into subdirs)' },
     ],
   },
   {
