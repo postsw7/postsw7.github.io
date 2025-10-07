@@ -2,7 +2,9 @@ import React from 'react'
 import { FILES, fileExists, listFiles } from '../core/files'
 import { isValidTheme, getThemeKeys } from '../core/themes'
 import { trackRecruiterView, trackResumeOpen, trackOpen } from '../core/analytics'
-import { RESUME_URL, LINK_ALIASES, DEMOS } from '../core/constants'
+import { RESUME_URL, LINK_ALIASES, DEMOS, JGREP_DEMO_STEPS } from '../core/constants'
+import { createTutorialState, nextStep, stepsTotal, remaining } from '../external/jgrepTutorial'
+import { trackDemoStart } from '../core/analytics'
 import { HELP_SECTIONS, HELP_FOOTER } from '../core/helpData'
 import { RECRUITER } from '../core/recruiterData'
 import { Github, Linkedin, Mail, FileText, Link2, HighlighterIcon, MapPin, Hourglass, Workflow, UserRound } from "lucide-react"
@@ -116,17 +118,63 @@ export function createRegistry(api: CommandContextApi, _currentPrompt: string): 
             )
           }
           if (demoName === 'jgrep') {
+            // Lazy attach tutorial state to globalThis to persist across rerenders
+            const g: any = globalThis as any
+            if (!g.__JGREP_TUTORIAL__) {
+              g.__JGREP_TUTORIAL__ = createTutorialState()
+              trackDemoStart('jgrep')
+            }
+            const state = g.__JGREP_TUTORIAL__
+            const first = state.index === -1
+            const stepInfo = first ? null : JGREP_DEMO_STEPS[state.index]
             return (
-              <div className="space-y-2">
-                <div className="text-[#00ffa6]">JSON-Grep Demo</div>
-                <div className="text-gray-400">Interactive JSON query tool - Coming soon!</div>
-                <div className="text-sm">This will allow you to filter and search JSON data.</div>
+              <div className="space-y-3">
+                <div className="text-[#00ffa6] font-semibold">JSON-Grep Demo</div>
+                <div className="text-sm text-gray-300 leading-relaxed">
+                  Type the commands below manually to explore features. Use <span className="text-[#00ffa6]">demo next</span> to show the next suggested command.
+                </div>
+                <div className="text-xs text-gray-400">Sample file: <span className="text-[#00ffa6]">sample.jsonl</span> (bundled)</div>
+                <div className="border border-gray-700 rounded p-3 text-sm space-y-1">
+                  {JGREP_DEMO_STEPS.map(s => (
+                    <div key={s.idx} className="flex gap-2 items-start">
+                      <span className={`w-6 text-right ${state.index >= s.idx ? 'text-[#00ffa6]' : 'text-gray-500'}`}>{s.idx + 1}.</span>
+                      <div>
+                        <div className="text-gray-200"><span className="text-[#00ffa6]">{s.title}</span></div>
+                        <div className="text-gray-400">{s.command}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                {first && <div className="text-xs text-gray-400">Start with step 1: type <span className="text-[#00ffa6]">{JGREP_DEMO_STEPS[0].command}</span></div>}
+                {!first && stepInfo && (
+                  <div className="text-xs text-gray-400">Current step: <span className="text-[#00ffa6]">{stepInfo.title}</span>. Remaining: {remaining(state)}</div>
+                )}
+                {state.done && <div className="text-xs text-[#00ffa6]">Tutorial complete — experiment freely with jgrep!</div>}
               </div>
             )
           }
           return `Unknown demo: ${demoName}. Try: run demo list`
         }
         return 'Usage: run demo <name>'
+      }
+    },
+    demo: {
+      desc: 'Helper for active demo session (demo next)',
+      usage: 'demo next',
+      handler: (args) => {
+        const sub = (args[0] || '').toLowerCase()
+        if (sub !== 'next') return 'Usage: demo next'
+        const g: any = globalThis as any
+        if (!g.__JGREP_TUTORIAL__) return 'No active demo. Start one: run demo jgrep'
+        const info = nextStep(g.__JGREP_TUTORIAL__)
+        if (!info) return 'No more steps. Tutorial complete.'
+        return (
+          <div className="space-y-1 text-sm">
+            <div className="text-[#00ffa6]">Step {g.__JGREP_TUTORIAL__.index + 1}/{stepsTotal()}: {info.title}</div>
+            <div className="text-gray-300">{info.blurb}</div>
+            <div className="text-gray-400">Command: <span className="text-[#00ffa6]">{info.stepText}</span></div>
+          </div>
+        )
       }
     },
     resume: {
