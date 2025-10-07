@@ -6,7 +6,7 @@ import { getTheme } from '../core/themes'
 import { tokenize, hasTrailingSpace } from '../core/tokenize'
 import { trackVisit, trackCommand, trackUnknownCommand } from '../core/analytics'
 import { createRegistry } from '../commands/registry'
-import { runJgrep } from '../external/jgrepWorkerClient'
+import { runJgrep, isJgrepReady } from '../external/jgrepWorkerClient'
 import { trackDemoError } from '../core/analytics'
 import { FS, list as vfsList, read as vfsRead, normalizePath, getNode, isDir, pathLabel } from '../core/vfs'
 import { getCompletionCandidates, applyCompletion } from './autocomplete'
@@ -57,8 +57,23 @@ export function CLI(): JSX.Element {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // Scroll to bottom when output grows OR when suggestions panel size changes (e.g., Tab autocomplete)
-  useEffect(() => { outputEndRef.current?.scrollIntoView({ behavior: 'smooth' }) }, [output, suggestions])
+  // Scroll to bottom when output grows OR when suggestions change.
+  // In JSDOM test environment, scrollIntoView may be undefined or not a function, so guard & fallback.
+  useEffect(() => {
+    const el = outputEndRef.current as any
+    if (!el) return
+    try {
+      if (typeof el.scrollIntoView === 'function') {
+        el.scrollIntoView({ behavior: 'smooth', block: 'end' })
+        return
+      }
+    } catch {/* ignore and fallback */}
+    // Fallback: manually adjust parent scroll if possible
+    const parent = el.parentElement
+    if (parent && typeof parent.scrollTo === 'function') {
+      try { parent.scrollTo(0, parent.scrollHeight) } catch {/* ignore */}
+    }
+  }, [output, suggestions])
   useEffect(() => { try { (globalThis as any).__CLI_CWD__ = cwd } catch (e) { /* ignore */ } }, [cwd])
   useEffect(() => { const h = () => inputRef.current?.focus(); document.addEventListener('click', h); return () => document.removeEventListener('click', h) }, [])
 
@@ -70,7 +85,7 @@ export function CLI(): JSX.Element {
   }
   const commands = createRegistry(api, theme.prompt)
 
-  // Animate spinner if active
+  // Animate spinner if active (first-time runtime load only)
   useEffect(() => {
     if (!jgrepSpinner) return
     const frames = ['⠋','⠙','⠹','⠸','⠼','⠴','⠦','⠧','⠇','⠏']
@@ -279,74 +294,89 @@ export function CLI(): JSX.Element {
 
     // External jgrep command passthrough
     if (cmdName === 'jgrep') {
-      // Create spinner line
+      const ready = isJgrepReady()
+      const buildNodeFromResult = (result: any) => {
+        if (result.format === 'lines') {
+          const text = result.lines.length ? result.lines.join('\n') : '(no matches)'
+          return <pre className="whitespace-pre-wrap">{text}</pre>
+        } else if (result.format === 'pretty') {
+          return <pre className="whitespace-pre">{result.blocks.join('\n')}</pre>
+        } else if (result.format === 'table') {
+          const widths = result.header.map((h: string, i: number) => Math.max(h.length, ...result.rows.map((r: string[]) => (r[i] || '').length)))
+          const pad = (v: string, i: number) => v + ' '.repeat(widths[i] - v.length)
+          const linesTxt = [result.header.map(pad).join('  '), ...result.rows.map((r: string[]) => r.map(pad).join('  '))]
+          return <pre className="whitespace-pre">{linesTxt.join('\n')}</pre>
+        } else if (result.format === 'tokens') {
+          return (
+            <div className="space-y-1">
+              {result.lines.map((ln: any, idx: number) => (
+                <div key={idx} className="whitespace-pre-wrap">
+                  {ln.map((tok: any, i: number) => {
+                    const base = 'font-mono'
+                    let cls = ''
+                    switch (tok.t) {
+                      case 'match': cls = 'text-[#ffa198] font-semibold'; break
+                      case 'key': cls = 'text-gray-400'; break
+                      case 'value': cls = 'text-gray-400'; break
+                      case 'number': cls = 'text-amber-300'; break
+                      case 'string': cls = 'text-gray-400'; break
+                      default: cls = 'text-gray-400'; break
+                    }
+                    return <span key={i} className={`${base} ${cls}`}>{tok.v}</span>
+                  })}
+                </div>
+              ))}
+            </div>
+          )
+        }
+        return <pre className="whitespace-pre-wrap">(unknown format)</pre>
+      }
+
+      if (ready) {
+        try {
+          const result = await runJgrep([cmdName, ...args])
+          addOutput({ type: 'output', content: buildNodeFromResult(result) })
+          finalizeCommand(commandId, 'ok')
+          return 'ok'
+        } catch (err: any) {
+          trackDemoError('jgrep', err?.message || 'unknown')
+          addOutput({ type: 'error', content: (err?.message || 'jgrep: error: unknown failure') })
+          finalizeCommand(commandId, 'err')
+          return 'err'
+        }
+      }
+
+      // Not ready yet: show first-load spinner with enforced delay
+      const spinnerStart = Date.now()
       const spinnerId = addOutput({ type: 'info', content: <span className="text-gray-400">⠋ loading jgrep runtime...</span> })
-      setJgrepSpinner({ id: spinnerId, start: Date.now() })
+      setJgrepSpinner({ id: spinnerId, start: spinnerStart })
+      const MIN_SPINNER_MS = 2000
+      const deferUntilMin = (fn: () => void) => {
+        const elapsed = Date.now() - spinnerStart
+        const remaining = MIN_SPINNER_MS - elapsed
+        if (remaining > 0) {
+          setTimeout(fn, remaining)
+        } else {
+          fn()
+        }
+      }
       try {
         const result = await runJgrep([cmdName, ...args])
-        const MIN_SPINNER_MS = 2000
-        const elapsed = Date.now() - (jgrepSpinner?.start || 0)
         const replace = () => {
-          setOutput(prev => prev.map(line => {
-            if (line.id !== spinnerId) return line
-            if (result.format === 'lines') {
-              const text = result.lines.length ? result.lines.join('\n') : '(no matches)'
-              return { ...line, type: 'output', content: <pre className="whitespace-pre-wrap">{text}</pre> }
-            } else if (result.format === 'pretty') {
-              return { ...line, type: 'output', content: <pre className="whitespace-pre">{result.blocks.join('\n')}</pre> }
-            } else if (result.format === 'table') {
-              const widths = result.header.map((h, i) => Math.max(h.length, ...result.rows.map(r => (r[i] || '').length)))
-              const pad = (v: string, i: number) => v + ' '.repeat(widths[i] - v.length)
-              const linesTxt = [result.header.map(pad).join('  '), ...result.rows.map(r => r.map(pad).join('  '))]
-              return { ...line, type: 'output', content: <pre className="whitespace-pre">{linesTxt.join('\n')}</pre> }
-            } else if (result.format === 'tokens') {
-              return { ...line, type: 'output', content: (
-                <div className="space-y-1">
-                  {result.lines.map((ln, idx) => (
-                    <div key={idx} className="whitespace-pre-wrap">
-                      {ln.map((tok, i) => {
-                        const base = 'font-mono'
-                        let cls = ''
-                        switch (tok.t) {
-                          case 'match': cls = 'text-[#ffa198] font-semibold'; break
-                          case 'key': cls = 'text-gray-400'; break
-                          case 'value': cls = 'text-gray-400'; break
-                          case 'number': cls = 'text-amber-300'; break
-                          case 'string': cls = 'text-gray-400'; break
-                          default: cls = 'text-gray-400'; break
-                        }
-                        return <span key={i} className={`${base} ${cls}`}>{tok.v}</span>
-                      })}
-                    </div>
-                  ))}
-                </div>
-              ) }
-            }
-            return { ...line, type: 'output', content: <pre className="whitespace-pre-wrap">(unknown format)</pre> }
-          }))
+          setOutput(prev => prev.map(line => line.id === spinnerId ? { ...line, type: 'output', content: buildNodeFromResult(result) } : line))
           setJgrepSpinner(null)
           finalizeCommand(commandId, 'ok')
         }
-        if (elapsed < MIN_SPINNER_MS) {
-          setTimeout(replace, MIN_SPINNER_MS - elapsed)
-        } else {
-          replace()
-        }
+        deferUntilMin(replace)
         return 'ok'
       } catch (err: any) {
         trackDemoError('jgrep', err?.message || 'unknown')
-        const MIN_SPINNER_MS = 2000
-        const elapsed = Date.now() - (jgrepSpinner?.start || 0)
         const replaceErr = () => {
           setOutput(prev => prev.map(line => line.id === spinnerId ? { ...line, type: 'error', content: (err?.message || 'jgrep: error: unknown failure') } : line))
           setJgrepSpinner(null)
           finalizeCommand(commandId, 'err')
         }
-        if (elapsed < MIN_SPINNER_MS) {
-          setTimeout(replaceErr, MIN_SPINNER_MS - elapsed)
-        } else {
-          replaceErr()
-        }
+        deferUntilMin(replaceErr)
         return 'err'
       }
     }
