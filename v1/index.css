@@ -14,6 +14,23 @@ body {
   line-height: 1.3em;
 }
 
+.archived-note {
+  font-family: monospace;
+  font-size: 11px;
+  line-height: 1.2;
+  color: #9ca3af;
+  white-space: nowrap;
+}
+
+.archived-note a {
+  color: #9ca3af;
+  text-decoration: none;
+}
+
+.archived-note a:hover {
+  color: #00ffa6;
+}
+
 body.light .terminal {
   color: #181b23;
 }
@@ -147,7 +164,10 @@ body.light #dollar {
   background-color: #d9e4ef;
   height: 30px;
   border-radius: 8px 8px 0 0;
-  padding-left: 10px;
+  padding: 0 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .terminal-header.light {
