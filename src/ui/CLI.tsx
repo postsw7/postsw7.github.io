@@ -41,6 +41,7 @@ export function CLI(): JSX.Element {
 
   const inputRef = useRef<HTMLInputElement | null>(null)
   const outputEndRef = useRef<HTMLDivElement | null>(null)
+  const scrollRef = useRef<HTMLDivElement | null>(null)
   const theme = getTheme(themeKey)
 
   // Track visit + welcome
@@ -57,22 +58,23 @@ export function CLI(): JSX.Element {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // Scroll to bottom when output grows OR when suggestions change.
-  // In JSDOM test environment, scrollIntoView may be undefined or not a function, so guard & fallback.
+  // Robust scroll-to-bottom: explicitly set scrollTop to scrollHeight after output changes.
   useEffect(() => {
-    const el = outputEndRef.current as any
-    if (!el) return
-    try {
-      if (typeof el.scrollIntoView === 'function') {
-        el.scrollIntoView({ behavior: 'smooth', block: 'end' })
-        return
-      }
-    } catch {/* ignore and fallback */}
-    // Fallback: manually adjust parent scroll if possible
-    const parent = el.parentElement
-    if (parent && typeof parent.scrollTo === 'function') {
-      try { parent.scrollTo(0, parent.scrollHeight) } catch {/* ignore */}
+    const container = scrollRef.current
+    const endEl = outputEndRef.current as any
+    if (!container) return
+
+    const forceScroll = () => {
+      try { container.scrollTop = container.scrollHeight } catch {/* ignore */}
     }
+
+    // Try native anchor scrolling first (not smooth to avoid partial positioning), then force.
+    if (endEl && typeof endEl.scrollIntoView === 'function') {
+      try { endEl.scrollIntoView({ block: 'end' }) } catch {/* ignore */}
+    }
+    forceScroll()
+    // Ensure after paint / layout
+    requestAnimationFrame(forceScroll)
   }, [output, suggestions])
   useEffect(() => { try { (globalThis as any).__CLI_CWD__ = cwd } catch (e) { /* ignore */ } }, [cwd])
   useEffect(() => { const h = () => inputRef.current?.focus(); document.addEventListener('click', h); return () => document.removeEventListener('click', h) }, [])
@@ -417,7 +419,7 @@ export function CLI(): JSX.Element {
               </div>
               <a href="/v1/" className="text-xs text-gray-400 hover:text-[#00ffa6] transition-colors" title="View legacy portfolio">v1 →</a>
             </div>
-            <div className={`${theme.terminalBg} p-4 sm:p-6 min-h-[600px] max-h-[80vh] overflow-y-auto`} style={{ scrollbarGutter: 'stable' }}>
+            <div ref={scrollRef} className={`${theme.terminalBg} p-4 sm:p-6 min-h-[600px] max-h-[80vh] overflow-y-auto`} style={{ scrollbarGutter: 'stable' }}>
               {output.map(item => (
                 <div key={item.id} className="mb-3">
                   {item.type === 'command' && <CommandRow theme={theme} item={item} />}
