@@ -28,16 +28,7 @@ function getPathCompletions(raw: string, opts: { onlyDirs?: boolean; onlyFiles?:
   const prefix = isDirHint ? '' : dirnameAndPrefix(input).prefix
   const rawEntries = vfsList(FS, cwd, baseDir || '.') || []
   const entries: Entry[] = rawEntries.map(e => ({ name: e.name, type: e.type === 'dir' ? 'dir' : 'file' as const }))
-  const specials = ['.', '..']
   const specialsOut: string[] = []
-
-  for (const s of specials) {
-    if (onlyFiles) continue
-    if (!prefix || s.startsWith(prefix)) {
-      const p = baseDir ? joinPath(baseDir, s) : s
-      specialsOut.push(p + '/')
-    }
-  }
 
   const out = entries.filter(e => {
     if (onlyDirs && e.type !== 'dir') return false
@@ -49,6 +40,17 @@ function getPathCompletions(raw: string, opts: { onlyDirs?: boolean; onlyFiles?:
   })
 
   return [...specialsOut, ...out]
+}
+
+function getSubdirectoryCompletions(dirToken: string): string[] {
+  // dirToken comes from previous argument, expected to end with '/'
+  if (!dirToken.endsWith('/')) return []
+  const cwd = cwdArray()
+  const base = dirToken.slice(0, -1) || '.'
+  const entries = vfsList(FS, cwd, base) || []
+  return entries
+    .filter(e => e.type === 'dir')
+    .map(e => dirToken + e.name + '/')
 }
 
 export function getCompletionCandidates(tokens: string[], trailingSpace: boolean, commands: CommandsMap): string[] {
@@ -68,8 +70,35 @@ export function getCompletionCandidates(tokens: string[], trailingSpace: boolean
   if (cmdName === 'theme') return getThemeCompletions(currentArg)
   if (cmdName === 'run') return getRunSubcommands(tokens, trailingSpace, currentArg)
   if (cmdName === 'show') return getShowSubcommands(tokens, trailingSpace, currentArg)
-  if (cmdName === 'cd') return getPathCompletions(currentArg, { onlyDirs: true })
-  if (cmdName === 'ls') return getPathCompletions(currentArg)
+  if (cmdName === 'cd') {
+    // If we just completed a directory (argument ends with '/' and a space followed it), list its subdirectories only
+    if (trailingSpace && tokens.length >= 2) {
+      const prev = tokens[tokens.length - 1]
+      if (prev.endsWith('/')) {
+        const subs = getSubdirectoryCompletions(prev)
+        if (subs.length === 1) {
+          // Auto expand the single subdirectory (keep drilling) by replacing last token in-place.
+          // We return the single completion so caller will apply it.
+          return subs
+        }
+        return subs
+      }
+    }
+    return getPathCompletions(currentArg, { onlyDirs: true })
+  }
+
+  if (cmdName === 'ls') {
+    if (trailingSpace && tokens.length >= 2) {
+      const prev = tokens[tokens.length - 1]
+      if (prev.endsWith('/')) {
+        const subs = getSubdirectoryCompletions(prev)
+        if (subs.length === 1) return subs
+        return subs
+      }
+    }
+    return getPathCompletions(currentArg)
+  }
+
   if (cmdName === 'open') {
     const aliases = ['github', 'linkedin', 'resume'];
     return aliases.filter(a => a.startsWith(currentArg))
@@ -79,11 +108,25 @@ export function getCompletionCandidates(tokens: string[], trailingSpace: boolean
 }
 
 export function applyCompletion(input: string, completion: string): string {
-  if (/\s$/.test(input)) return input + completion + ' '
+  // If the input already ends with space, we're starting a new argument.
+  // Avoid duplicating the immediately preceding token (bug: `cd jgrep/ ` + Tab => `cd jgrep/ jgrep/`).
+  if (/\s$/.test(input)) {
+    const tokens = input.trim().split(/\s+/)
+    const last = tokens[tokens.length - 1]
+    // Normalize both sides by stripping a single trailing slash for comparison.
+    const norm = (v: string) => v.endsWith('/') ? v.slice(0, -1) : v
+    if (last && norm(last) === norm(completion)) {
+      // Already have this completion as the previous argument; do nothing.
+      return input
+    }
+    // If completion is a directory (ends with '/'), do NOT append trailing space so we can keep drilling deeper.
+    return input + completion + (completion.endsWith('/') ? '' : ' ')
+  }
+
   const tokens = input.trim().split(/\s+/)
   if (tokens.length === 0) return completion + ' '
   tokens[tokens.length - 1] = completion
-  return tokens.join(' ') + ' '
+  return tokens.join(' ') + (completion.endsWith('/') ? '' : ' ')
 }
 
 function getThemeCompletions(prefix: string) { const themes = ['siwoo', 'light', 'dracula']; return themes.filter(t => t.toLowerCase().startsWith(prefix.toLowerCase())) }
