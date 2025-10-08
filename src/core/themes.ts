@@ -26,7 +26,7 @@ export const THEMES: Record<string, Theme> = {
     link: 'text-[#4285f4]',
     error: 'text-[#e75448]',
     caret: 'bg-[#ffffff]',
-    prompt: 'siwoo@lee:~$',
+  prompt: 'USE_STRINGS_PROMPT',
   },
   light: {
     name: 'Light',
@@ -40,7 +40,7 @@ export const THEMES: Record<string, Theme> = {
     link: 'text-blue-500',
     error: 'text-red-600',
     caret: 'bg-gray-900',
-    prompt: 'siwoo@web:~$',
+  prompt: 'USE_STRINGS_PROMPT',
   },
 }
 
