@@ -6,7 +6,7 @@ import './styles.css'
 import './styles/theme.css'
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
-	<ThemeProvider>
-		<App />
-	</ThemeProvider>
+  <ThemeProvider>
+    <App />
+  </ThemeProvider>
 )
