@@ -45,6 +45,8 @@ export function CLI(): JSX.Element {
   const suppressedDirEnterRef = useRef<string | null>(null)
   // Suppress first Enter after an autocompletion (file or dir) to require explicit confirmation.
   const suppressedAutocompleteEnterRef = useRef<string | null>(null)
+  // Track exact input resulting from a single-candidate completion so Enter executes immediately.
+  const singleCandidateCompletionRef = useRef<string | null>(null)
 
   // Track visit + welcome
   useEffect(() => {
@@ -132,7 +134,7 @@ export function CLI(): JSX.Element {
 
       addOutput({
         type: 'command',
-  prompt: buildPrompt(pathLabel(cwd)),
+        prompt: buildPrompt(pathLabel(cwd)),
         content: (input || '') + '^C',
         meta: { status: activeStatus, branch: 'base', time: timeLabel }
       })
@@ -193,15 +195,21 @@ export function CLI(): JSX.Element {
       const candidates = getCompletionCandidates(tokens, trailing, commands)
 
       if (candidates.length === 1) {
-        setInput(applyCompletion(input, candidates[0]))
+        // Single candidate: apply directly and allow immediate Enter (no suppression, incl. directory tokens)
+        const completed = applyCompletion(input, candidates[0])
+        setInput(completed)
         setSuggestions(null)
-        suppressedAutocompleteEnterRef.current = applyCompletion(input, candidates[0])
+        suppressedAutocompleteEnterRef.current = null
+        singleCandidateCompletionRef.current = completed
         return
       }
       if (candidates.length > 1) {
         setSuggestions({ list: candidates, index: 0, baseInput: input })
-        setInput(applyCompletion(input, candidates[0]))
-        suppressedAutocompleteEnterRef.current = applyCompletion(input, candidates[0])
+        const completed = applyCompletion(input, candidates[0])
+        setInput(completed)
+        // Multi-candidate: require confirmation Enter.
+        suppressedAutocompleteEnterRef.current = completed
+        singleCandidateCompletionRef.current = null
         return
       }
     }
@@ -210,8 +218,17 @@ export function CLI(): JSX.Element {
       setSuggestions(null)
       setHistoryIndex(-1)
 
-      // Generic suppression: if this exact input resulted from last autocomplete, require second Enter.
+      // Generic suppression: swallow first Enter after multi-candidate completion (prevents premature execution of file).
       if (suppressedAutocompleteEnterRef.current && suppressedAutocompleteEnterRef.current === input) {
+        // If it's a directory token (cat/cd with trailing '/'), mark directory confirm to avoid triple-enter.
+        const toks = tokenize(input)
+        if (toks.length >= 2) {
+          const cmd0 = toks[0]
+            const lastTok = toks[toks.length - 1]
+            if ((cmd0 === 'cat' || cmd0 === 'cd') && lastTok.endsWith('/')) {
+              suppressedDirEnterRef.current = input
+            }
+        }
         suppressedAutocompleteEnterRef.current = null
         return
       }
@@ -224,13 +241,18 @@ export function CLI(): JSX.Element {
           const cmd0 = rawTokens[0]
           const lastTok = rawTokens[rawTokens.length - 1]
           if ((cmd0 === 'cat' || cmd0 === 'cd') && lastTok.endsWith('/')) {
-            if (suppressedDirEnterRef.current !== input) {
-              suppressedDirEnterRef.current = input
-              // Clear any existing suggestions and wait for explicit Tab.
-              setSuggestions(null)
-              return
-            }
+            // If this input came from a single-candidate completion, execute immediately.
+            if (singleCandidateCompletionRef.current === input) {
+              singleCandidateCompletionRef.current = null
+            } else {
+              if (suppressedDirEnterRef.current !== input) {
+                suppressedDirEnterRef.current = input
+                // Clear any existing suggestions and wait for explicit Tab.
+                setSuggestions(null)
+                return
+              }
             // Second Enter with same input: allow execution (cat will error if dir, cd will change into it)
+            }
           }
         }
       }
@@ -252,7 +274,7 @@ export function CLI(): JSX.Element {
       const timeLabel = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       const cmdId = addOutput({
         type: 'command',
-  prompt: buildPrompt(pathLabel(cwd)),
+        prompt: buildPrompt(pathLabel(cwd)),
         content: line,
         meta: { status: activeStatus, branch: 'base', time: timeLabel }
       })
@@ -445,7 +467,7 @@ export function CLI(): JSX.Element {
     }
 
     return (
-  <div className="min-h-screen bg-app text-fg p-4 sm:p-8 font-mono">
+      <div className="min-h-screen bg-app text-fg p-4 sm:p-8 font-mono">
         <div className="max-w-5xl mx-auto">
           <div className="border border-gray-600 rounded-lg overflow-hidden shadow-2xl">
             <div className="bg-header px-4 py-2 flex items-center justify-between">
@@ -466,7 +488,7 @@ export function CLI(): JSX.Element {
                   {item.type === 'info' && <div className="ml-0 text-gray-400">{item.content}</div>}
                 </div>
               ))}
-              <ActivePrompt cwd={cwd} input={input} onChange={(e) => { setInput(e.target.value); if (suggestions) setSuggestions(null) }} onKeyDown={handleKeyDown} activeStatus={activeStatus} inputRef={inputRef} suggestions={suggestions} />
+              <ActivePrompt cwd={cwd} input={input} onChange={(e) => { setInput(e.target.value); if (suggestions) setSuggestions(null); suppressedAutocompleteEnterRef.current = null; singleCandidateCompletionRef.current = null }} onKeyDown={handleKeyDown} activeStatus={activeStatus} inputRef={inputRef} suggestions={suggestions} />
               {suggestions && suggestions.list.length > 1 && (
                 <div className="mt-2 ml-6">
                   <div className="text-gray-400 mb-1">Candidates (Tab to cycle):</div>
