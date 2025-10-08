@@ -7,7 +7,6 @@ interface Umami {
 interface Window {
   umami?: Umami
   __CLI_CWD__?: string[]
-  __CLI_FILES__?: string[]
 }
 
 export {}

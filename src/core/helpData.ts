@@ -24,7 +24,7 @@ export const HELP_SECTIONS: HelpSection[] = [
     items: [
       { cmd: 'show recruiter', desc: 'View recruiter card' },
       { cmd: 'open <github|linkedin|resume>', desc: 'Open quick links' },
-      { cmd: 'theme <name>', desc: 'Change theme (siwoo, light, dracula)' },
+  { cmd: 'theme <dark|light>', desc: 'Change theme (dark or light)' },
     ],
   },
   {
