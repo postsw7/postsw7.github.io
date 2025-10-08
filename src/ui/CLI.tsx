@@ -12,6 +12,7 @@ import { getCompletionCandidates, applyCompletion } from './autocomplete'
 import { CommandRow } from './components/CommandRow'
 import { ActivePrompt } from './components/ActivePrompt'
 import { Banner } from './components/Banner'
+import { STRINGS, buildPrompt, rootPrompt } from '../core/strings'
 
 // Basic types for output items
 interface CommandMeta { status: Status; branch: string; time: string }
@@ -86,7 +87,7 @@ export function CLI(): JSX.Element {
     },
     files: {},
   }
-  const commands = createRegistry(api, 'siwoo@lee:~$')
+  const commands = createRegistry(api, rootPrompt())
 
   // Animate spinner if active (first-time runtime load only)
   useEffect(() => {
@@ -128,7 +129,7 @@ export function CLI(): JSX.Element {
 
       addOutput({
         type: 'command',
-        prompt: `siwoo@lee:${pathLabel(cwd)}$`,
+  prompt: buildPrompt(pathLabel(cwd)),
         content: (input || '') + '^C',
         meta: { status: activeStatus, branch: 'base', time: timeLabel }
       })
@@ -215,7 +216,7 @@ export function CLI(): JSX.Element {
       const timeLabel = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       const cmdId = addOutput({
         type: 'command',
-        prompt: `siwoo@lee:${pathLabel(cwd)}$`,
+  prompt: buildPrompt(pathLabel(cwd)),
         content: line,
         meta: { status: activeStatus, branch: 'base', time: timeLabel }
       })
@@ -416,7 +417,7 @@ export function CLI(): JSX.Element {
                 <div className="w-3 h-3 rounded-full bg-[#ff5f56]"></div>
                 <div className="w-3 h-3 rounded-full bg-[#ffbd2e]"></div>
                 <div className="w-3 h-3 rounded-full bg-[#27c93f]"></div>
-                <span className="ml-4 text-sm text-gray-400">siwoo@lee ~ v2</span>
+                <span className="ml-4 text-sm text-gray-400">{STRINGS.promptBase} ~ {STRINGS.versionLabel}</span>
               </div>
               <a href="/v1/" className="text-xs text-gray-400 hover:text-accent transition-colors" title="View legacy portfolio">v1 →</a>
             </div>
