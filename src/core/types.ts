@@ -4,7 +4,6 @@ export type CLIOutput = string | React.ReactNode | (string | React.ReactNode)[]
 
 export interface API {
   echo: (output: CLIOutput) => void
-  files: Record<string, string>
   setTheme?: (theme: string) => void
   clear?: () => void
 }

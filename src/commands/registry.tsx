@@ -1,5 +1,4 @@
 import React from 'react'
-import { FILES, fileExists, listFiles } from '../core/files'
 import { trackRecruiterView, trackResumeOpen, trackOpen } from '../core/analytics'
 import { RESUME_URL, LINK_ALIASES, DEMOS, JGREP_DEMO_STEPS } from '../core/constants'
 import { createTutorialState, nextStep, stepsTotal, remaining } from '../external/jgrepTutorial'
@@ -23,7 +22,6 @@ const FILE_ICONS: Record<string, React.ReactNode> = {
 
 export interface CommandContextApi {
   echo: (output: React.ReactNode) => void
-  files: Record<string, string>
   setTheme?: (theme: string) => void
   clear?: () => void
 }
@@ -37,7 +35,7 @@ export interface CommandSpec {
 export type CommandRegistry = Record<string, CommandSpec>
 
 export function createRegistry(api: CommandContextApi, _currentPrompt: string): CommandRegistry {
-  try { (globalThis as any).__CLI_FILES__ = Object.keys(FILES) } catch (e) { /* ignore exposure errors */ }
+  // Legacy flat-file list fully removed; no global exposure required.
   const registry: CommandRegistry = {
     help: {
       desc: 'Show available commands',
@@ -64,26 +62,7 @@ export function createRegistry(api: CommandContextApi, _currentPrompt: string): 
       desc: 'Clear the terminal',
       handler: () => api.clear && api.clear()
     },
-    ls: {
-      desc: 'List available files',
-      handler: () => {
-        const files = listFiles()
-        return <div className="grid grid-cols-2 gap-2">{files.map(f => <div key={f} className="text-accent">{f}</div>)}</div>
-      }
-    },
-    cat: {
-      desc: 'Display file contents',
-      usage: 'cat <filename>',
-      handler: (args) => {
-        if (!args.length) return 'Usage: cat <filename>. Try: ls'
-
-        const filename = args[0]
-
-        if (!fileExists(filename)) return `File not found: ${filename}. Try: ls`
-
-        return <pre className="whitespace-pre-wrap">{(FILES as Record<string,string>)[filename]}</pre>
-      }
-    },
+    // ls & cat commands handled directly by core CLI (VFS-backed). We intentionally omit duplicates here.
     theme: {
       desc: 'Change color theme',
       usage: 'theme <dark|light>',

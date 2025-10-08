@@ -129,7 +129,7 @@ export function applyCompletion(input: string, completion: string): string {
   return tokens.join(' ') + (completion.endsWith('/') ? '' : ' ')
 }
 
-function getThemeCompletions(prefix: string) { const themes = ['siwoo', 'light', 'dracula']; return themes.filter(t => t.toLowerCase().startsWith(prefix.toLowerCase())) }
+function getThemeCompletions(prefix: string) { const themes = ['dark', 'light']; return themes.filter(t => t.toLowerCase().startsWith(prefix.toLowerCase())) }
 
 function getRunSubcommands(tokens: string[], trailing: boolean, current: string) {
   const subs = ['demo']

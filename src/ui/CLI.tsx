@@ -85,7 +85,6 @@ export function CLI(): JSX.Element {
       const k = key === 'light' ? 'light' : 'dark'
       document.documentElement.dataset.theme = k as any
     },
-    files: {},
   }
   const commands = createRegistry(api, rootPrompt())
 
