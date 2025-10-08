@@ -1,7 +1,27 @@
 """
-Minimal jgrep engine for web demo (Pyodide).
-Provides subset of CLI features with structured JSON output for the portfolio site.
-Supported flags (simplified): -E <pattern>, --key <key.path>, --where "cond string", --extract <fields>, --table, --pretty
+Minimal jgrep engine for the web demo (Pyodide).
+
+This is a deliberately reduced subset of the full jgrep CLI to minimize payload size and
+keep the browser runtime simple. It focuses on quick, illustrative filtering & extraction.
+
+Included flags:
+    -E <pattern>          Regex search (Python re; no custom engine limitations here)
+    -i                    Case-insensitive (prepends (?i) if not present)
+    --key <path>          Require JSON key to exist (and if a pattern is provided, key value must match it)
+    --where "k=v k2=v2"   Very small subset: only space-separated key=value pairs (logical AND). No operators like !=, ~, !~, <, <=, >, >=.
+    --extract <fields>    Comma-separated field names for extraction
+    --table               Render extracted rows as a simple table
+    --pretty              Pretty-print matching JSON lines
+
+Outputs:
+    lines   (raw matched lines)
+    tokens  (tokenized JSON with lightweight match segmentation for inline highlighting in React)
+    table   (aligned columns from --extract + --table)
+    pretty  (pretty-printed JSON blocks)
+
+Explicitly NOT included (present in full CLI): --highlight, --json-out, --stats, --parallel, complex where operators, multi-file / recursive search.
+
+If additional flags are passed they raise an error to keep UX explicit.
 """
 from __future__ import annotations
 import json, re
@@ -9,10 +29,10 @@ from typing import List, Dict, Any, Optional
 from pathlib import Path
 
 # Import only required subset from project modules
-try:
-    from jgrep.engine import match_pattern as _regex_match
-    from jgrep.jsonmode import try_parse_json, get_nested_value, match_where, extract_fields, pretty_print_json
-except Exception:  # Fallback minimal implementations if import fails
+try:  # Optional: when running inside full repo sync (not required in standalone web build)
+    from jgrep.engine import match_pattern as _regex_match  # type: ignore
+    from jgrep.jsonmode import try_parse_json, get_nested_value, match_where, extract_fields, pretty_print_json  # type: ignore
+except Exception:  # Fallback minimal implementations if import fails (web demo path)
     def _regex_match(line: str, pattern: str) -> bool:
         if not pattern:
             return True

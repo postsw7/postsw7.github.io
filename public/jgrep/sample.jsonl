@@ -1,0 +1,5 @@
+{"ts":"2025-10-06T12:00:01Z","level":"INFO","service":"auth","msg":"user login","user":{"id":"101","role":"user"}}
+{"ts":"2025-10-06T12:00:02Z","level":"ERROR","service":"auth","msg":"password failure","err":{"code":"AUTH-42","detail":"invalid password"},"user":{"id":"102"}}
+{"ts":"2025-10-06T12:00:03Z","level":"INFO","service":"payments","msg":"charge initiated","user":{"id":"103"}}
+{"ts":"2025-10-06T12:00:04Z","level":"ERROR","service":"payments","msg":"card declined","err":{"code":"PMT-13","detail":"card expired"},"user":{"id":"104"}}
+{"ts":"2025-10-06T12:00:05Z","level":"ERROR","service":"auth","msg":"quota exceeded","err":{"code":"AUTH-99"},"user":{"id":"105"}}
