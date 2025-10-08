@@ -2,7 +2,6 @@
 // CLI Component - Interactive Terminal
 // ============================================================================
 import React, { useState, useEffect, useRef, KeyboardEvent } from 'react'
-import { getTheme } from '../core/themes'
 import { tokenize, hasTrailingSpace } from '../core/tokenize'
 import { trackVisit, trackCommand, trackUnknownCommand } from '../core/analytics'
 import { createRegistry } from '../commands/registry'
@@ -28,7 +27,7 @@ type LineItem = CommandItem | OutputItem | ErrorItem | InfoItem
 interface SuggestionState { list: string[]; index: number; baseInput: string }
 
 export function CLI(): JSX.Element {
-  const [themeKey, setThemeKey] = useState('siwoo')
+  // Theme now driven purely by CSS data-theme; no local state needed
   const [input, setInput] = useState('')
   const [history, setHistory] = useState<string[]>([])
   const [cwd, setCwd] = useState<string[]>([])
@@ -42,7 +41,6 @@ export function CLI(): JSX.Element {
   const inputRef = useRef<HTMLInputElement | null>(null)
   const outputEndRef = useRef<HTMLDivElement | null>(null)
   const scrollRef = useRef<HTMLDivElement | null>(null)
-  const theme = getTheme(themeKey)
 
   // Track visit + welcome
   useEffect(() => {
@@ -82,10 +80,13 @@ export function CLI(): JSX.Element {
   const api = {
     echo: (content: React.ReactNode) => addOutput({ type: 'output', content }),
     clear: () => setOutput([]),
-    setTheme: (key: string) => setThemeKey(key),
+    setTheme: (key: string) => {
+      const k = key === 'light' ? 'light' : 'dark'
+      document.documentElement.dataset.theme = k as any
+    },
     files: {},
   }
-  const commands = createRegistry(api, theme.prompt)
+  const commands = createRegistry(api, 'siwoo@lee:~$')
 
   // Animate spinner if active (first-time runtime load only)
   useEffect(() => {
@@ -127,7 +128,7 @@ export function CLI(): JSX.Element {
 
       addOutput({
         type: 'command',
-        prompt: `${theme.prompt.replace('~$', pathLabel(cwd) + '$')}`,
+        prompt: `siwoo@lee:${pathLabel(cwd)}$`,
         content: (input || '') + '^C',
         meta: { status: activeStatus, branch: 'base', time: timeLabel }
       })
@@ -214,7 +215,7 @@ export function CLI(): JSX.Element {
       const timeLabel = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       const cmdId = addOutput({
         type: 'command',
-        prompt: `${theme.prompt.replace('~$', pathLabel(cwd) + '$')}`,
+        prompt: `siwoo@lee:${pathLabel(cwd)}$`,
         content: line,
         meta: { status: activeStatus, branch: 'base', time: timeLabel }
       })
@@ -267,7 +268,7 @@ export function CLI(): JSX.Element {
         return 'err'
       }
 
-      addOutput({ type: 'output', content: (<div className="flex flex-wrap gap-4">{entries.map(e => <span key={e.name} className={e.type === 'dir' ? 'text-[#00ffa6]' : ''}>{e.type === 'dir' ? e.name + '/' : e.name}</span>)}</div>) })
+  addOutput({ type: 'output', content: (<div className="flex flex-wrap gap-4">{entries.map(e => <span key={e.name} className={e.type === 'dir' ? 'text-accent' : ''}>{e.type === 'dir' ? e.name + '/' : e.name}</span>)}</div>) })
       finalizeCommand(commandId, 'ok')
 
       return 'ok'
@@ -407,28 +408,28 @@ export function CLI(): JSX.Element {
     }
 
     return (
-      <div className={`min-h-screen ${theme.bg} ${theme.fg} p-4 sm:p-8 font-mono`}>
+  <div className="min-h-screen bg-app text-fg p-4 sm:p-8 font-mono">
         <div className="max-w-5xl mx-auto">
           <div className="border border-gray-600 rounded-lg overflow-hidden shadow-2xl">
-            <div className={`${theme.headerBg} px-4 py-2 flex items-center justify-between`}>
+            <div className="bg-header px-4 py-2 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-[#ff5f56]"></div>
                 <div className="w-3 h-3 rounded-full bg-[#ffbd2e]"></div>
                 <div className="w-3 h-3 rounded-full bg-[#27c93f]"></div>
-                <span className="ml-4 text-sm text-gray-400">siwoo@portfolio ~ v2</span>
+                <span className="ml-4 text-sm text-gray-400">siwoo@lee ~ v2</span>
               </div>
-              <a href="/v1/" className="text-xs text-gray-400 hover:text-[#00ffa6] transition-colors" title="View legacy portfolio">v1 →</a>
+              <a href="/v1/" className="text-xs text-gray-400 hover:text-accent transition-colors" title="View legacy portfolio">v1 →</a>
             </div>
-            <div ref={scrollRef} className={`${theme.terminalBg} p-4 sm:p-6 min-h-[600px] max-h-[80vh] overflow-y-auto`} style={{ scrollbarGutter: 'stable' }}>
+            <div ref={scrollRef} className="bg-terminal p-4 sm:p-6 min-h-[600px] max-h-[80vh] overflow-y-auto" style={{ scrollbarGutter: 'stable' }}>
               {output.map(item => (
                 <div key={item.id} className="mb-3">
-                  {item.type === 'command' && <CommandRow theme={theme} item={item} />}
+                  {item.type === 'command' && <CommandRow item={item} />}
                   {item.type === 'output' && <div className="ml-0">{item.content}</div>}
-                  {item.type === 'error' && <div className={`ml-0 ${theme.error}`}>{item.content}</div>}
+                  {item.type === 'error' && <div className="ml-0 text-[#e75448]">{item.content}</div>}
                   {item.type === 'info' && <div className="ml-0 text-gray-400">{item.content}</div>}
                 </div>
               ))}
-              <ActivePrompt theme={theme} cwd={cwd} input={input} onChange={(e) => { setInput(e.target.value); if (suggestions) setSuggestions(null) }} onKeyDown={handleKeyDown} activeStatus={activeStatus} inputRef={inputRef} suggestions={suggestions} />
+              <ActivePrompt cwd={cwd} input={input} onChange={(e) => { setInput(e.target.value); if (suggestions) setSuggestions(null) }} onKeyDown={handleKeyDown} activeStatus={activeStatus} inputRef={inputRef} suggestions={suggestions} />
               {suggestions && suggestions.list.length > 1 && (
                 <div className="mt-2 ml-6">
                   <div className="text-gray-400 mb-1">Candidates (Tab to cycle):</div>
@@ -443,7 +444,7 @@ export function CLI(): JSX.Element {
             </div>
           </div>
           <footer className="mt-4 text-center text-sm text-gray-500">
-            <a href="https://github.com/postsw7/postsw7.github.io" target="_blank" rel="noopener noreferrer" className="hover:text-[#00ffa6] transition-colors">GitHub</a>
+            <a href="https://github.com/postsw7/postsw7.github.io" target="_blank" rel="noopener noreferrer" className="hover:text-accent transition-colors">GitHub</a>
           </footer>
         </div>
       </div>

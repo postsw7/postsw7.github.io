@@ -1,6 +1,5 @@
 import React from 'react'
 import { FILES, fileExists, listFiles } from '../core/files'
-import { isValidTheme, getThemeKeys } from '../core/themes'
 import { trackRecruiterView, trackResumeOpen, trackOpen } from '../core/analytics'
 import { RESUME_URL, LINK_ALIASES, DEMOS, JGREP_DEMO_STEPS } from '../core/constants'
 import { createTutorialState, nextStep, stepsTotal, remaining } from '../external/jgrepTutorial'
@@ -47,10 +46,12 @@ export function createRegistry(api: CommandContextApi, _currentPrompt: string): 
         if (args.length > 0) {
           const cmdName = args[0]
           const cmd = registry[cmdName]
-            if (!cmd) return `Unknown command: ${cmdName}`
+
+          if (!cmd) return `Unknown command: ${cmdName}`
+
           return (
             <div>
-              <div className="text-[#00ffa6]">{cmdName}</div>
+              <div className="text-accent">{cmdName}</div>
               <div className="ml-4 mt-1">{cmd.desc}</div>
               {cmd.usage && <div className="ml-4 text-sm text-gray-400">Usage: {cmd.usage}</div>}
             </div>
@@ -67,7 +68,7 @@ export function createRegistry(api: CommandContextApi, _currentPrompt: string): 
       desc: 'List available files',
       handler: () => {
         const files = listFiles()
-        return <div className="grid grid-cols-2 gap-2">{files.map(f => <div key={f} className="text-[#00ffa6]">{f}</div>)}</div>
+        return <div className="grid grid-cols-2 gap-2">{files.map(f => <div key={f} className="text-accent">{f}</div>)}</div>
       }
     },
     cat: {
@@ -75,20 +76,27 @@ export function createRegistry(api: CommandContextApi, _currentPrompt: string): 
       usage: 'cat <filename>',
       handler: (args) => {
         if (!args.length) return 'Usage: cat <filename>. Try: ls'
+
         const filename = args[0]
+
         if (!fileExists(filename)) return `File not found: ${filename}. Try: ls`
-  return <pre className="whitespace-pre-wrap">{(FILES as Record<string,string>)[filename]}</pre>
+
+        return <pre className="whitespace-pre-wrap">{(FILES as Record<string,string>)[filename]}</pre>
       }
     },
     theme: {
       desc: 'Change color theme',
-      usage: 'theme <name>',
+      usage: 'theme <dark|light>',
       handler: (args) => {
-        if (!args.length) return `Available themes: ${getThemeKeys().join(', ')}`
-        const themeName = args[0].toLowerCase()
-        if (!isValidTheme(themeName)) return `Invalid theme: ${themeName}. Available: ${getThemeKeys().join(', ')}`
-        api.setTheme && api.setTheme(themeName)
-        return `Theme changed to: ${themeName}`
+        if (!args.length) return 'Available themes: dark, light'
+
+        const t = args[0].toLowerCase()
+
+        if (t !== 'dark' && t !== 'light') return 'Invalid theme. Options: dark, light'
+
+        api.setTheme && api.setTheme(t)
+
+        return `Theme changed to: ${t}`
       }
     },
     show: {
@@ -108,11 +116,10 @@ export function createRegistry(api: CommandContextApi, _currentPrompt: string): 
         if (sub === 'demo') {
           const demoName = (args[1] || '').toLowerCase()
           if (demoName === 'list' || !demoName) {
-            // TODO: Link to GitHub repo for full list
             return (
               <div className="space-y-2">
-                <div className="text-[#00ffa6]">Available Demos:</div>
-                <div className="ml-4 space-y-1">{DEMOS.map(d => <div key={d.key}>• <span className="text-[#00ffa6]">{d.name}</span> - {d.desc}</div>)}</div>
+                <div className="text-accent">Available Demos:</div>
+                <div className="ml-4 space-y-1">{DEMOS.map(d => <div key={d.key}>• <span className="text-accent">{d.name}</span> - {d.desc}</div>)}</div>
                 <div className="text-sm text-gray-400 mt-2">Usage: run demo &lt;name&gt;</div>
               </div>
             )
@@ -129,27 +136,27 @@ export function createRegistry(api: CommandContextApi, _currentPrompt: string): 
             const stepInfo = first ? null : JGREP_DEMO_STEPS[state.index]
             return (
               <div className="space-y-3">
-                <div className="text-[#00ffa6] font-semibold">JSON-Grep Demo</div>
+                <div className="text-accent font-semibold">JSON-Grep Demo</div>
                 <div className="text-sm text-gray-300 leading-relaxed">
-                  Type the commands below manually to explore features. Use <span className="text-[#00ffa6]">demo next</span> to show the next suggested command.
+                  Type the commands below manually to explore features. Use <span className="text-accent">demo next</span> to show the next suggested command.
                 </div>
-                <div className="text-xs text-gray-400">Sample file: <span className="text-[#00ffa6]">sample.jsonl</span> (bundled)</div>
+                <div className="text-xs text-gray-400">Sample file: <span className="text-accent">sample.jsonl</span> (bundled)</div>
                 <div className="border border-gray-700 rounded p-3 text-sm space-y-1">
                   {JGREP_DEMO_STEPS.map(s => (
                     <div key={s.idx} className="flex gap-2 items-start">
-                      <span className={`w-6 text-right ${state.index >= s.idx ? 'text-[#00ffa6]' : 'text-gray-500'}`}>{s.idx + 1}.</span>
+                      <span className={`w-6 text-right ${state.index >= s.idx ? 'text-accent' : 'text-gray-500'}`}>{s.idx + 1}.</span>
                       <div>
-                        <div className="text-gray-200"><span className="text-[#00ffa6]">{s.title}</span></div>
+                        <div className="text-gray-200"><span className="text-accent">{s.title}</span></div>
                         <div className="text-gray-400">{s.command}</div>
                       </div>
                     </div>
                   ))}
                 </div>
-                {first && <div className="text-xs text-gray-400">Start with step 1: type <span className="text-[#00ffa6]">{JGREP_DEMO_STEPS[0].command}</span></div>}
+                {first && <div className="text-xs text-gray-400">Start with step 1: type <span className="text-accent">{JGREP_DEMO_STEPS[0].command}</span></div>}
                 {!first && stepInfo && (
-                  <div className="text-xs text-gray-400">Current step: <span className="text-[#00ffa6]">{stepInfo.title}</span>. Remaining: {remaining(state)}</div>
+                  <div className="text-xs text-gray-400">Current step: <span className="text-accent">{stepInfo.title}</span>. Remaining: {remaining(state)}</div>
                 )}
-                {state.done && <div className="text-xs text-[#00ffa6]">Tutorial complete — experiment freely with jgrep!</div>}
+                {state.done && <div className="text-xs text-accent">Tutorial complete — experiment freely with jgrep!</div>}
               </div>
             )
           }
@@ -170,9 +177,9 @@ export function createRegistry(api: CommandContextApi, _currentPrompt: string): 
         if (!info) return 'No more steps. Tutorial complete.'
         return (
           <div className="space-y-1 text-sm">
-            <div className="text-[#00ffa6]">Step {g.__JGREP_TUTORIAL__.index + 1}/{stepsTotal()}: {info.title}</div>
+            <div className="text-accent">Step {g.__JGREP_TUTORIAL__.index + 1}/{stepsTotal()}: {info.title}</div>
             <div className="text-gray-300">{info.blurb}</div>
-            <div className="text-gray-400">Command: <span className="text-[#00ffa6]">{info.stepText}</span></div>
+            <div className="text-gray-400">Command: <span className="text-accent">{info.stepText}</span></div>
           </div>
         )
       }
@@ -202,9 +209,9 @@ export function createRegistry(api: CommandContextApi, _currentPrompt: string): 
       desc: 'Show social links',
       handler: () => (
         <div className="space-y-1">
-          <div><span className="text-[#00ffa6]">linkedin</span> → https://www.linkedin.com/in/siwoolee/</div>
-          <div><span className="text-[#00ffa6]">github</span> → https://github.com/postsw7</div>
-          <div><span className="text-[#00ffa6]">email</span> → postsw7@gmail.com</div>
+          <div><span className="text-accent">linkedin</span> → https://www.linkedin.com/in/siwoolee/</div>
+          <div><span className="text-accent">github</span> → https://github.com/postsw7</div>
+          <div><span className="text-accent">email</span> → postsw7@gmail.com</div>
         </div>
       )
     }
@@ -215,15 +222,15 @@ export function createRegistry(api: CommandContextApi, _currentPrompt: string): 
 function HelpRenderer() {
   return (
     <div className="space-y-3">
-      <div className="text-[#00ffa6] font-bold">Available Commands:</div>
-      {HELP_SECTIONS.map(section => (
-        <div key={section.title}>
-          <div className="text-[#fff292]">{section.title}:</div>
-          <div className="ml-4 text-sm space-y-1">
-            {section.items.map(it => <div key={it.cmd}><span className="text-[#00ffa6]">{it.cmd}</span> - {it.desc}</div>)}
+      <div className="text-accent font-bold">Available Commands:</div>
+        {HELP_SECTIONS.map(section => (
+          <div key={section.title}>
+            <div className="text-highlight">{section.title}:</div>
+            <div className="ml-4 text-sm space-y-1">
+              {section.items.map(it => <div key={it.cmd}><span className="text-accent">{it.cmd}</span> - {it.desc}</div>)}
+            </div>
           </div>
-        </div>
-      ))}
+        ))}
       <div className="text-sm text-gray-400 mt-3">{HELP_FOOTER}</div>
     </div>
   )
@@ -232,8 +239,10 @@ function HelpRenderer() {
 function RecruiterCard() {
   return (
     <div className="border border-[#00ffa6]/30 rounded-lg p-6 max-w-2xl space-y-4 bg-[#1a1f2a]">
-      <div className="text-xl font-bold text-[#00ffa6]">
-        <div className="center-flex justify-self-start">{FILE_ICONS['profile']} <span>{RECRUITER.name}</span></div>
+      <div className="text-xl font-bold text-accent">
+        <div className="center-flex justify-self-start">
+          {FILE_ICONS['profile']} <span>{RECRUITER.name}</span>
+        </div>
       </div>
       <div className="space-y-2 text-sm">
         <div>{FILE_ICONS['location']} <span className="text-gray-300">{RECRUITER.location}</span></div>
@@ -241,11 +250,13 @@ function RecruiterCard() {
         <div>{FILE_ICONS['tagline']} <span className="text-gray-300">{RECRUITER.tagline}</span></div>
       </div>
       <div className="pt-3 border-t border-gray-700">
-        <div className="text-[#fff292] mb-2">{FILE_ICONS['highlight']} Key Highlights:</div>
-        <ul className="text-sm space-y-1 ml-4 text-gray-400">{RECRUITER.highlights.map(h => <li key={h}>• {h}</li>)}</ul>
+        <div className="text-highlight mb-2">{FILE_ICONS['highlight']} Key Highlights:</div>
+        <ul className="text-sm space-y-1 ml-4 text-gray-400">
+          {RECRUITER.highlights.map(h => <li key={h}>• {h}</li>)}
+        </ul>
       </div>
       <div className="pt-3 border-t border-gray-700 space-y-2">
-        <div className="text-[#fff292]">{FILE_ICONS['link']} Quick Links:</div>
+        <div className="text-highlight">{FILE_ICONS['link']} Quick Links:</div>
         <div className="flex flex-wrap gap-3 text-sm">
           {RECRUITER.links.map((l, i) => (
             <React.Fragment key={l.type}>

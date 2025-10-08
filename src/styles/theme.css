@@ -1,0 +1,36 @@
+/* Theme CSS variables and utility classes */
+/* Default (dark) */
+:root {
+  --fg: #9ca3af; /* gray-400 */
+  --prompt-bg: #2b2f3a;
+  --prompt-tri: #2b2f3a;
+  --app-bg: #30353a;
+  --terminal-bg: #181b23;
+  --header-bg: #d9e4ef;
+  --error: #e75448;
+  --accent: #00ffa6;
+  --highlight: #fff292;
+}
+
+[data-theme="light"] {
+  --fg: #111827; /* gray-900 */
+  --prompt-bg: #e5e7eb; /* gray-200 */
+  --prompt-tri: #e5e7eb;
+  --app-bg: #f9fafb; /* gray-50 */
+  --terminal-bg: #ffffff;
+  --header-bg: #f3f4f6; /* gray-100 */
+  --error: #dc2626; /* red-600 */
+  --accent: #0d9488; /* teal-600 for better contrast on light */
+  --highlight: #d97706; /* amber-600 for light theme */
+}
+
+.text-fg { color: var(--fg); }
+.bg-prompt { background-color: var(--prompt-bg); }
+.bg-app { background-color: var(--app-bg); }
+.bg-terminal { background-color: var(--terminal-bg); }
+.bg-header { background-color: var(--header-bg); }
+.text-error { color: var(--error); }
+.text-accent { color: var(--accent); }
+.hover\:text-accent:hover { color: var(--accent); }
+.text-highlight { color: var(--highlight); }
+/* Triangles use inline style border color var(--prompt-tri) */
