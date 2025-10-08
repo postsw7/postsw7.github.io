@@ -38,10 +38,13 @@ export function CLI(): JSX.Element {
   const [activeStatus, setActiveStatus] = useState<Status>('ok')
   // Inline jgrep spinner state (replaces itself with result once loaded)
   const [jgrepSpinner, setJgrepSpinner] = useState<{ id: string; start: number } | null>(null)
-
   const inputRef = useRef<HTMLInputElement | null>(null)
   const outputEndRef = useRef<HTMLDivElement | null>(null)
   const scrollRef = useRef<HTMLDivElement | null>(null)
+  // Tracks last directory-prefixed cat/cd input we suppressed (first Enter)
+  const suppressedDirEnterRef = useRef<string | null>(null)
+  // Suppress first Enter after an autocompletion (file or dir) to require explicit confirmation.
+  const suppressedAutocompleteEnterRef = useRef<string | null>(null)
 
   // Track visit + welcome
   useEffect(() => {
@@ -75,6 +78,7 @@ export function CLI(): JSX.Element {
     // Ensure after paint / layout
     requestAnimationFrame(forceScroll)
   }, [output, suggestions])
+  // Placeholder logic removed per updated UX: new prompt state is always baseline.
   useEffect(() => { try { (globalThis as any).__CLI_CWD__ = cwd } catch (e) { /* ignore */ } }, [cwd])
   useEffect(() => { const h = () => inputRef.current?.focus(); document.addEventListener('click', h); return () => document.removeEventListener('click', h) }, [])
 
@@ -180,6 +184,7 @@ export function CLI(): JSX.Element {
         const completed = applyCompletion(suggestions.baseInput, suggestions.list[nextIndex])
         setSuggestions({ ...suggestions, index: nextIndex })
         setInput(completed)
+        suppressedAutocompleteEnterRef.current = completed
         return
       }
 
@@ -190,11 +195,13 @@ export function CLI(): JSX.Element {
       if (candidates.length === 1) {
         setInput(applyCompletion(input, candidates[0]))
         setSuggestions(null)
+        suppressedAutocompleteEnterRef.current = applyCompletion(input, candidates[0])
         return
       }
       if (candidates.length > 1) {
         setSuggestions({ list: candidates, index: 0, baseInput: input })
         setInput(applyCompletion(input, candidates[0]))
+        suppressedAutocompleteEnterRef.current = applyCompletion(input, candidates[0])
         return
       }
     }
@@ -203,7 +210,37 @@ export function CLI(): JSX.Element {
       setSuggestions(null)
       setHistoryIndex(-1)
 
-      const line = input.trim()
+      // Generic suppression: if this exact input resulted from last autocomplete, require second Enter.
+      if (suppressedAutocompleteEnterRef.current && suppressedAutocompleteEnterRef.current === input) {
+        suppressedAutocompleteEnterRef.current = null
+        return
+      }
+
+      // Suppress first Enter for 'cat <dir>/' or 'cd <dir>/' (no trailing space):
+      // Do NOT auto-show suggestions; user can press Tab to list contents.
+      if (!input.endsWith(' ')) {
+        const rawTokens = tokenize(input)
+        if (rawTokens.length >= 2) {
+          const cmd0 = rawTokens[0]
+          const lastTok = rawTokens[rawTokens.length - 1]
+          if ((cmd0 === 'cat' || cmd0 === 'cd') && lastTok.endsWith('/')) {
+            if (suppressedDirEnterRef.current !== input) {
+              suppressedDirEnterRef.current = input
+              // Clear any existing suggestions and wait for explicit Tab.
+              setSuggestions(null)
+              return
+            }
+            // Second Enter with same input: allow execution (cat will error if dir, cd will change into it)
+          }
+        }
+      }
+
+      // Clear suppression marker when executing a different line
+      if (suppressedDirEnterRef.current && suppressedDirEnterRef.current !== input) {
+        suppressedDirEnterRef.current = null
+      }
+
+  const line = input.trim()
 
       if (!line) {
         setInput('')

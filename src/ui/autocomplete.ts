@@ -66,7 +66,18 @@ export function getCompletionCandidates(tokens: string[], trailingSpace: boolean
   const cmdName = tokens[0]
   const currentArg = trailingSpace ? '' : (tokens[tokens.length - 1] || '')
 
-  if (cmdName === 'cat') return getPathCompletions(currentArg, { onlyFiles: true })
+  if (cmdName === 'cat') {
+    const last = tokens[tokens.length - 1]
+    if (last && last.endsWith('/')) {
+      const cwd = cwdArray()
+      const base = last.slice(0, -1) || '.'
+      const entries = vfsList(FS, cwd, base) || []
+      // Return relative names ONLY (no parent prefix) so UI shows clean file names.
+      return entries.map(e => e.name + (e.type === 'dir' ? '/' : ''))
+    }
+    if (trailingSpace) return []
+    return getPathCompletions(currentArg)
+  }
   if (cmdName === 'theme') return getThemeCompletions(currentArg)
   if (cmdName === 'run') return getRunSubcommands(tokens, trailingSpace, currentArg)
   if (cmdName === 'show') return getShowSubcommands(tokens, trailingSpace, currentArg)
@@ -110,6 +121,8 @@ export function getCompletionCandidates(tokens: string[], trailingSpace: boolean
 export function applyCompletion(input: string, completion: string): string {
   // If the input already ends with space, we're starting a new argument.
   // Avoid duplicating the immediately preceding token (bug: `cd jgrep/ ` + Tab => `cd jgrep/ jgrep/`).
+  // NOTE: First Enter after a completion is generically suppressed in CLI.tsx (suppressedAutocompleteEnterRef)
+  // to avoid premature execution for both files and directories.
   if (/\s$/.test(input)) {
     const tokens = input.trim().split(/\s+/)
     const last = tokens[tokens.length - 1]
@@ -125,7 +138,20 @@ export function applyCompletion(input: string, completion: string): string {
 
   const tokens = input.trim().split(/\s+/)
   if (tokens.length === 0) return completion + ' '
-  tokens[tokens.length - 1] = completion
+  const last = tokens[tokens.length - 1]
+  // If last token is a directory (ends with '/') and completion is relative (no '/'), prefix it.
+  if (last.endsWith('/')) {
+    // Treat completion as relative if it contains no internal slashes (only optional trailing one)
+    const core = completion.endsWith('/') ? completion.slice(0, -1) : completion
+    const hasInternal = core.includes('/')
+    if (!hasInternal) {
+      tokens[tokens.length - 1] = last + completion
+    } else {
+      tokens[tokens.length - 1] = completion
+    }
+  } else {
+    tokens[tokens.length - 1] = completion
+  }
   return tokens.join(' ') + (completion.endsWith('/') ? '' : ' ')
 }
 
