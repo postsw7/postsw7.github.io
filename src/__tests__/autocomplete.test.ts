@@ -71,6 +71,33 @@ describe('autocomplete (commands + VFS)', () => {
     expect(cands).toEqual(['README.md'])
   })
 
+  it('cat profile/a<Tab> drills into profile directory and suggests about.md', () => {
+    const cands = getCompletionCandidates(['cat', 'profile/a'], false, registry)
+    expect(cands).toEqual(['profile/about.md'])
+  })
+
+  it('cat profile/ lists entries inside profile (relative names only)', () => {
+    const cands = getCompletionCandidates(['cat', 'profile/'], false, registry)
+    expect(cands).toEqual(expect.arrayContaining([
+      'about.md', 'skills.md', 'experience.md', 'contact.md'
+    ]))
+  })
+
+  it('applyCompletion with relative name after dir prefixes it correctly', () => {
+    const result = applyCompletion('cat profile/', 'about.md')
+    expect(result.startsWith('cat profile/about.md')).toBe(true)
+  })
+
+  it('applyCompletion prefixes nested project path (cat projects/ + jgrep/)', () => {
+    const result = applyCompletion('cat projects/', 'jgrep/')
+    expect(result.startsWith('cat projects/jgrep/')).toBe(true)
+  })
+
+  it('cat projects/jgrep/README.md <space> has no further completions', () => {
+    const cands = getCompletionCandidates(['cat', 'projects/jgrep/README.md'], true, registry)
+    expect(cands).toEqual([])
+  })
+
   it('apply after "cd " appends directory token without overwriting command', () => {
     const cands = getCompletionCandidates(['cd'], true, registry)
     const chosen = cands.includes('projects/') ? 'projects/' : cands[0]
