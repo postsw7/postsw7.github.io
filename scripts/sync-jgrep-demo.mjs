@@ -8,7 +8,7 @@ import { fileURLToPath } from 'url'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
 // Assume sibling directory structure; allow override via env JGREP_REPO
-const repoRoot = process.env.JGREP_REPO || join(__dirname, '..', '..', 'build-my-own-x', 'json-grep')
+const repoRoot = process.env.JGREP_REPO || join(__dirname, '..', 'json-grep')
 const srcDir = join(repoRoot, 'web-demo')
 const destDir = join(__dirname, '..', 'public', 'jgrep')
 
