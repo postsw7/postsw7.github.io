@@ -14,8 +14,8 @@ export interface Theme {
 }
 
 export const THEMES: Record<string, Theme> = {
-  siwoo: {
-    name: 'Siwoo (Default)',
+  dark: {
+    name: 'Dark',
     bg: 'bg-[#30353a]',
     terminalBg: 'bg-[#181b23]',
     headerBg: 'bg-[#d9e4ef]',
@@ -26,7 +26,7 @@ export const THEMES: Record<string, Theme> = {
     link: 'text-[#4285f4]',
     error: 'text-[#e75448]',
     caret: 'bg-[#ffffff]',
-    prompt: 'Siwoo@Lee:~$',
+    prompt: 'siwoo@lee:~$',
   },
   light: {
     name: 'Light',
@@ -42,22 +42,8 @@ export const THEMES: Record<string, Theme> = {
     caret: 'bg-gray-900',
     prompt: 'siwoo@web:~$',
   },
-  dracula: {
-    name: 'Dracula',
-    bg: 'bg-[#282a36]',
-    terminalBg: 'bg-[#1e1f29]',
-    headerBg: 'bg-[#1a1b26]',
-    fg: 'text-[#f8f8f2]',
-    accent: 'text-[#50fa7b]',
-    secondary: 'text-[#ff79c6]',
-    tertiary: 'text-[#f1fa8c]',
-    link: 'text-[#8be9fd]',
-    error: 'text-[#ff5555]',
-    caret: 'bg-[#f8f8f2]',
-    prompt: 'dracula@terminal:~$',
-  },
 }
 
-export function getTheme(key: string): Theme { return THEMES[key] || THEMES.siwoo }
+export function getTheme(key: string): Theme { return THEMES[key] || THEMES.dark }
 export function getThemeKeys(): string[] { return Object.keys(THEMES) }
 export function isValidTheme(key: string): boolean { return key in THEMES }
