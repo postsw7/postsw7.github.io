@@ -37,7 +37,7 @@ describe('path-aware autocomplete (VFS-backed)', () => {
   it('cd pro<Tab> returns both profile/ and projects/ (ambiguous)', () => {
     const cands = getCompletionCandidates(['cd', 'pro'], false, registry)
     expect(cands).toEqual(expect.arrayContaining(['projects/', 'profile/']))
-    expect(cands.length).toBe(2)
+    expect(cands).toHaveLength(2)
   })
 
   it('cat R<Tab> in root completes to README.md (files only)', () => {
@@ -49,6 +49,6 @@ describe('path-aware autocomplete (VFS-backed)', () => {
     const cands = getCompletionCandidates(['cd'], true, registry)
     const dir = cands.includes('projects/') ? 'projects/' : cands[0]
     const next = applyCompletion('cd ', dir)
-    expect(next.startsWith('cd projects/') || next.startsWith('cd profile/')).toBe(true)
+    expect(next).toMatch(/^cd (projects|profile)\//)
   })
 })

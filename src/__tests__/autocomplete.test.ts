@@ -24,12 +24,15 @@ describe('autocomplete (commands + VFS)', () => {
 
   // Command name basics
   it('completes command names', () => {
-    expect(getCompletionCandidates(['he'], false, registry)).toEqual(['help'])
+    const cands = getCompletionCandidates(['he'], false, registry)
+    expect(cands).toEqual(['help'])
   })
 
   it('lists ambiguous command candidates', () => {
     const cands = getCompletionCandidates(['c'], false, registry)
     expect(cands.sort()).toEqual(['cat', 'cd', 'clear'])
+    // ensure no unexpected command surfaced
+    expect(cands).not.toContain('help')
   })
 
   it('applies completion with space after unique command', () => {
@@ -85,12 +88,12 @@ describe('autocomplete (commands + VFS)', () => {
 
   it('applyCompletion with relative name after dir prefixes it correctly', () => {
     const result = applyCompletion('cat profile/', 'about.md')
-    expect(result.startsWith('cat profile/about.md')).toBe(true)
+    expect(result).toMatch(/^cat profile\/about\.md/) // anchored
   })
 
   it('applyCompletion prefixes nested project path (cat projects/ + jgrep/)', () => {
     const result = applyCompletion('cat projects/', 'jgrep/')
-    expect(result.startsWith('cat projects/jgrep/')).toBe(true)
+    expect(result).toMatch(/^cat projects\/jgrep\//)
   })
 
   it('cat projects/jgrep/README.md <space> has no further completions', () => {
@@ -102,6 +105,6 @@ describe('autocomplete (commands + VFS)', () => {
     const cands = getCompletionCandidates(['cd'], true, registry)
     const chosen = cands.includes('projects/') ? 'projects/' : cands[0]
     const next = applyCompletion('cd ', chosen)
-    expect(next.startsWith('cd projects/') || next.startsWith('cd profile/')).toBe(true)
+    expect(next).toMatch(/^cd (projects|profile)\//)
   })
 })

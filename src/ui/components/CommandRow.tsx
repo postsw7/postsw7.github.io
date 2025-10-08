@@ -7,7 +7,7 @@ interface Props { item: Item }
 
 export function CommandRow({ item }: Props) {
   return (
-    <div className="flex items-center justify-between gap-2 text-[14px] leading-none -mx-4 sm:-mx-6">
+    <div role="group" aria-label="command" className="flex items-center justify-between gap-2 text-[14px] leading-none -mx-4 sm:-mx-6">
       <div className="flex items-center min-w-0">
           <div className="flex items-center bg-prompt rounded-l pl-2 pr-1 h-6 leading-none">
             <span className="text-[#00b2ff]">{item.prompt}</span>
