@@ -5,9 +5,19 @@ interface Props { status: 'ok' | 'int' | 'err' }
 export function ActiveStatusPill({ status }: Props) {
   const [now, setNow] = useState(() => new Date())
 
+  // Update exactly at the start of each new minute so the active pill never
+  // lags behind a recently executed command that captured a later minute.
   useEffect(() => {
-    const id = setInterval(() => setNow(new Date()), 1000 * 30)
-    return () => clearInterval(id)
+    let timeout: number
+    function schedule() {
+      const d = new Date()
+      setNow(d)
+      // milliseconds until the next minute boundary
+      const ms = (60 - d.getSeconds()) * 1000 - d.getMilliseconds()
+      timeout = window.setTimeout(schedule, ms)
+    }
+    schedule()
+    return () => clearTimeout(timeout)
   }, [])
 
   const timeLabel = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
