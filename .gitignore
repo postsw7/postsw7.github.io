@@ -36,6 +36,7 @@ lib-cov
 .parcel-cache
 turbo/
 build/Release
+.vite/
 
 ###############################
 # TypeScript
