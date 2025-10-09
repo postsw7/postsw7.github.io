@@ -1,5 +1,6 @@
 // Tokenizer Tests
 import { describe, it, expect } from 'vitest'
+
 import { tokenize, hasTrailingSpace } from '../core/tokenize'
 
 describe('tokenize', () => {

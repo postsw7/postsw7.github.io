@@ -2,10 +2,13 @@
 // Handles loading the worker (Pyodide-backed in real deployment) and sending commands.
 // The real worker will be delivered into /public/jgrep/ by the json-grep repo action.
 
-import { JGREP_WORKER_PATH, JGREP_VERSION_META_PATH } from '../core/constants'
 import { trackDemoCommand, trackDemoError } from '../core/analytics'
+import { JGREP_WORKER_PATH, JGREP_VERSION_META_PATH } from '../core/constants'
 
-export interface JgrepToken { t: string; v: string }
+export interface JgrepToken {
+  t: string
+  v: string
+}
 export type JgrepResult =
   | { format: 'lines'; lines: string[]; meta?: any }
   | { format: 'table'; header: string[]; rows: string[][]; meta?: any }
@@ -13,7 +16,12 @@ export type JgrepResult =
   | { format: 'json'; data: any[]; meta?: any }
   | { format: 'tokens'; lines: JgrepToken[][]; meta?: any }
 
-interface Pending { resolve: (v: JgrepResult) => void; reject: (e: any) => void; started: number; argv: string[] }
+interface Pending {
+  resolve: (v: JgrepResult) => void
+  reject: (e: any) => void
+  started: number
+  argv: string[]
+}
 
 let worker: Worker | null = null
 let ready = false
@@ -32,7 +40,7 @@ export function onJgrepProgress(fn: ProgressListener) {
 }
 
 function emitProgress(evt: ProgressEvent) {
-  progressListeners.forEach(listener => {
+  progressListeners.forEach((listener) => {
     try {
       listener(evt)
     } catch {
@@ -41,7 +49,9 @@ function emitProgress(evt: ProgressEvent) {
   })
 }
 
-function genId(): string { return Math.random().toString(36).slice(2) }
+function genId(): string {
+  return Math.random().toString(36).slice(2)
+}
 
 async function fetchVersion(): Promise<string | null> {
   try {
@@ -49,7 +59,9 @@ async function fetchVersion(): Promise<string | null> {
     if (!res.ok) return null
     const data = await res.json()
     return data.commit || null
-  } catch { return null }
+  } catch {
+    return null
+  }
 }
 
 export async function ensureWorker(): Promise<void> {
@@ -98,13 +110,21 @@ export async function ensureWorker(): Promise<void> {
     const start = Date.now()
     const max = 10000
     const interval = setInterval(() => {
-      if (ready) { clearInterval(interval); resolve() }
-      if (Date.now() - start > max) { clearInterval(interval); reject(new Error('jgrep runtime load timeout (10s)')) }
+      if (ready) {
+        clearInterval(interval)
+        resolve()
+      }
+      if (Date.now() - start > max) {
+        clearInterval(interval)
+        reject(new Error('jgrep runtime load timeout (10s)'))
+      }
     }, 150)
   })
 }
 
-export function isJgrepReady(): boolean { return ready }
+export function isJgrepReady(): boolean {
+  return ready
+}
 
 export async function runJgrep(argv: string[]): Promise<JgrepResult> {
   await ensureWorker()
@@ -130,23 +150,33 @@ export async function runJgrep(argv: string[]): Promise<JgrepResult> {
 // Development stub: if no real worker exists, fabricate a result
 if (import.meta.env.DEV) {
   // Attempt to detect 404 by prefetching
-  fetch(JGREP_WORKER_PATH, { method: 'HEAD' }).then(res => {
-    if (!res.ok) {
-      // Replace ensureWorker & runJgrep with mock
-      console.warn('[jgrep demo] worker not found, using mock responses')
-  ready = true
-  worker = { postMessage: () => {} } as unknown as Worker
-  // Dynamically override exported functions in dev mock scenario
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ;(ensureWorker as any) = async () => { ready = true }
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ;(runJgrep as any) = async (argv: string[]) => {
-        const line = argv.join(' ')
-        if (argv.includes('--table')) {
-          return { format: 'table', header: ['ts', 'service', 'err.code'], rows: [ ['2025-10-06T00:00:00Z','auth','AUTH-42'] ] }
+  fetch(JGREP_WORKER_PATH, { method: 'HEAD' })
+    .then((res) => {
+      if (!res.ok) {
+        // Replace ensureWorker & runJgrep with mock
+        console.warn('[jgrep demo] worker not found, using mock responses')
+        ready = true
+        worker = { postMessage: () => {} } as unknown as Worker
+        // Dynamically override exported functions in dev mock scenario
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        ;(ensureWorker as any) = async () => {
+          ready = true
         }
-        return { format: 'lines', lines: [`mock result for: ${line}`] }
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        ;(runJgrep as any) = async (argv: string[]) => {
+          const line = argv.join(' ')
+          if (argv.includes('--table')) {
+            return {
+              format: 'table',
+              header: ['ts', 'service', 'err.code'],
+              rows: [['2025-10-06T00:00:00Z', 'auth', 'AUTH-42']],
+            }
+          }
+          return { format: 'lines', lines: [`mock result for: ${line}`] }
+        }
       }
-    }
-  }).catch(() => {/* ignore */})
+    })
+    .catch(() => {
+      /* ignore */
+    })
 }

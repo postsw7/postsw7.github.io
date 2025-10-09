@@ -1,7 +1,11 @@
 import { describe, it, expect, beforeEach } from 'vitest'
+
 import { getCompletionCandidates, applyCompletion } from '../ui/autocomplete'
 
-interface TestCmd { desc: string; handler: (...args: any[]) => void }
+interface TestCmd {
+  desc: string
+  handler: (...args: any[]) => void
+}
 const registry: Record<string, TestCmd> = {
   help: { desc: '', handler: () => {} },
   clear: { desc: '', handler: () => {} },
@@ -14,7 +18,7 @@ const registry: Record<string, TestCmd> = {
 
 describe('path-aware autocomplete (VFS-backed)', () => {
   beforeEach(() => {
-    (globalThis as any).__CLI_CWD__ = []
+    ;(globalThis as any).__CLI_CWD__ = []
   })
 
   it('cd <Tab> suggests root directories', () => {
@@ -28,9 +32,11 @@ describe('path-aware autocomplete (VFS-backed)', () => {
   })
 
   it('ls <Tab> in /profile suggests only profile files', () => {
-  (globalThis as any).__CLI_CWD__ = ['profile']
+    ;(globalThis as any).__CLI_CWD__ = ['profile']
     const cands = getCompletionCandidates(['ls'], true, registry)
-    expect(cands).toEqual(expect.arrayContaining(['about.md', 'skills.md', 'experience.md', 'contact.md']))
+    expect(cands).toEqual(
+      expect.arrayContaining(['about.md', 'skills.md', 'experience.md', 'contact.md']),
+    )
     expect(cands).not.toEqual(expect.arrayContaining(['README.md', 'projects/']))
   })
 

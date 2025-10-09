@@ -1,8 +1,12 @@
 import { describe, it, expect, beforeEach } from 'vitest'
+
 import { getCompletionCandidates, applyCompletion } from '../ui/autocomplete'
 
 // Minimal registry for testing (handlers unused)
-interface TestCmd { desc: string; handler: (...args: any[]) => void }
+interface TestCmd {
+  desc: string
+  handler: (...args: any[]) => void
+}
 const registry: Record<string, TestCmd> = {
   help: { desc: '', handler: () => {} },
   clear: { desc: '', handler: () => {} },
@@ -19,7 +23,7 @@ const registry: Record<string, TestCmd> = {
 describe('autocomplete (commands + VFS)', () => {
   beforeEach(() => {
     // Simulate root directory for VFS-backed completion
-    (globalThis as any).__CLI_CWD__ = []
+    ;(globalThis as any).__CLI_CWD__ = []
   })
 
   // Command name basics
@@ -57,9 +61,11 @@ describe('autocomplete (commands + VFS)', () => {
   })
 
   it('ls <Tab> in /profile suggests only profile files', () => {
-    (globalThis as any).__CLI_CWD__ = ['profile']
+    ;(globalThis as any).__CLI_CWD__ = ['profile']
     const cands = getCompletionCandidates(['ls'], true, registry)
-    expect(cands).toEqual(expect.arrayContaining(['about.md', 'skills.md', 'experience.md', 'contact.md']))
+    expect(cands).toEqual(
+      expect.arrayContaining(['about.md', 'skills.md', 'experience.md', 'contact.md']),
+    )
     expect(cands).not.toEqual(expect.arrayContaining(['README.md', 'projects/']))
   })
 
@@ -81,9 +87,9 @@ describe('autocomplete (commands + VFS)', () => {
 
   it('cat profile/ lists entries inside profile (relative names only)', () => {
     const cands = getCompletionCandidates(['cat', 'profile/'], false, registry)
-    expect(cands).toEqual(expect.arrayContaining([
-      'about.md', 'skills.md', 'experience.md', 'contact.md'
-    ]))
+    expect(cands).toEqual(
+      expect.arrayContaining(['about.md', 'skills.md', 'experience.md', 'contact.md']),
+    )
   })
 
   it('applyCompletion with relative name after dir prefixes it correctly', () => {

@@ -1,8 +1,10 @@
+import userEvent from '@testing-library/user-event'
 import React from 'react'
 import { describe, it, expect } from 'vitest'
-import { render, screen } from './utils'
-import userEvent from '@testing-library/user-event'
+
 import { CLI } from '../ui/CLI'
+
+import { render, screen } from './utils'
 
 // These tests focus on interaction semantics around autocomplete + Enter.
 // We rely on the in-memory VFS defined in vfs.ts.

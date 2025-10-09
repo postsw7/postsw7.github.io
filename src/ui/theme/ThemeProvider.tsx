@@ -9,7 +9,9 @@ interface ThemeContextValue {
 const ThemeContext = createContext<ThemeContextValue | undefined>(undefined)
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setThemeState] = useState<'dark' | 'light'>(() => (document.documentElement.dataset.theme === 'light' ? 'light' : 'dark'))
+  const [theme, setThemeState] = useState<'dark' | 'light'>(() =>
+    document.documentElement.dataset.theme === 'light' ? 'light' : 'dark',
+  )
 
   const apply = (t: 'dark' | 'light') => {
     document.documentElement.dataset.theme = t
@@ -19,12 +21,12 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const setTheme = (t: 'dark' | 'light') => apply(t)
   const toggle = () => apply(theme === 'dark' ? 'light' : 'dark')
 
-  useEffect(() => { apply(theme) }, [])
+  useEffect(() => {
+    apply(theme)
+  }, [theme])
 
   return (
-    <ThemeContext.Provider value={{ theme, toggle, setTheme }}>
-      {children}
-    </ThemeContext.Provider>
+    <ThemeContext.Provider value={{ theme, toggle, setTheme }}>{children}</ThemeContext.Provider>
   )
 }
 
