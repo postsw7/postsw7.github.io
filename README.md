@@ -14,9 +14,9 @@ Now I wanted it to be interactive, something that actually feels like a develope
 
 ---
 
-## Reflection: Working *with* AI, not against it
+## Reflection: Working _with_ AI, not against it
 
-When I first started using AI tools, I treated them as fancy autocompletes. While reviving `jgrep`, I learned to guide them instead of fighting them or rewriting everything. I focused on shaping ideas, catching logic gaps, and keeping the output close to what I meant. It felt more like collaboration than automation.
+When I first started using AI tools, I treated them as fancy autocompletes. While reviving [`jgrep`](https://github.com/postsw7/json-grep), I learned to guide them instead of fighting them or rewriting everything. I focused on shaping ideas, catching logic gaps, and keeping the output close to what I meant. It felt more like collaboration than automation.
 
 ---
 
@@ -25,9 +25,11 @@ When I first started using AI tools, I treated them as fancy autocompletes. Whil
 A small demo that merges `grep` ergonomics with JSON awareness.
 
 **Run it in the terminal:**
+
 - `run demo jgrep` – guided script + free-form mode
 
 What it demonstrates:
+
 - Key-based matching: `--key user.role -E 'user'`
 - Where-style filters: `--where 'level=ERROR service=auth'`
 - Field extraction & table display: `--extract ts,service,err.code --table`
