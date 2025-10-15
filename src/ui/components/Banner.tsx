@@ -1,5 +1,7 @@
 import React from 'react'
 
+import { RESUME_URL, LINK_ALIASES } from '../../core/constants'
+
 export function Banner() {
   return (
     <div className="mb-6 select-none">
@@ -76,6 +78,29 @@ export function Banner() {
 
       <div className="mt-4 text-center text-sm text-gray-400">
         Type <span className="text-[#44D39F]">&apos;help&apos;</span> to explore
+      </div>
+      <div className="mt-1 text-center text-sm text-gray-400">
+        Or type <span className="text-[#44D39F]">&apos;show recruiter&apos;</span> for a quick intro
+      </div>
+      <div className="mt-1 text-center text-sm text-gray-400">
+        In a hurry? Just click my{' '}
+        <a
+          className="underline hover:text-[#44D39F]"
+          href={RESUME_URL}
+          target="_blank"
+          rel="noreferrer noopener"
+        >
+          Resume
+        </a>{' '}
+        or{' '}
+        <a
+          className="underline hover:text-[#44D39F]"
+          href={LINK_ALIASES.linkedin}
+          target="_blank"
+          rel="noreferrer noopener"
+        >
+          LinkedIn
+        </a>
       </div>
     </div>
   )
