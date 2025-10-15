@@ -98,16 +98,12 @@ export function createRegistry(api: CommandContextApi, _currentPrompt: string): 
         return `Theme changed to: ${t}`
       },
     },
-    show: {
-      desc: 'Show special content',
-      usage: 'show <what>',
-      handler: (args) => {
-        const what = (args[0] || '').toLowerCase()
-        if (what === 'recruiter') {
-          trackRecruiterView()
-          return <RecruiterCard />
-        }
-        return 'Usage: show recruiter'
+    whoami: {
+      desc: 'Show a quick profile card (recruiter-friendly)',
+      usage: 'whoami',
+      handler: () => {
+        trackRecruiterView()
+        return <RecruiterCard />
       },
     },
     run: {

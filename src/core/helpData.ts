@@ -1,5 +1,11 @@
-export interface HelpItem { cmd: string; desc: string }
-export interface HelpSection { title: string; items: HelpItem[] }
+export interface HelpItem {
+  cmd: string
+  desc: string
+}
+export interface HelpSection {
+  title: string
+  items: HelpItem[]
+}
 
 export const HELP_SECTIONS: HelpSection[] = [
   {
@@ -9,7 +15,10 @@ export const HELP_SECTIONS: HelpSection[] = [
       { cmd: 'clear', desc: 'Clear the terminal' },
       { cmd: 'pwd', desc: 'Print current directory' },
       { cmd: 'ls [path]', desc: 'List directory entries' },
-      { cmd: 'cd <path>', desc: 'Change directory (use cd .. for parent, Tab to drill into subdirs)' },
+      {
+        cmd: 'cd <path>',
+        desc: 'Change directory (use cd .. for parent, Tab to drill into subdirs)',
+      },
     ],
   },
   {
@@ -22,9 +31,9 @@ export const HELP_SECTIONS: HelpSection[] = [
   {
     title: 'Special',
     items: [
-      { cmd: 'show recruiter', desc: 'View recruiter card' },
+      { cmd: 'whoami', desc: 'View recruiter-friendly profile card' },
       { cmd: 'open <github|linkedin|resume>', desc: 'Open quick links' },
-  { cmd: 'theme <dark|light>', desc: 'Change theme (dark or light)' },
+      { cmd: 'theme <dark|light>', desc: 'Change theme (dark or light)' },
     ],
   },
   {
@@ -36,4 +45,4 @@ export const HELP_SECTIONS: HelpSection[] = [
   },
 ]
 
-export const HELP_FOOTER = "Tip: Use Tab for autocomplete, ↑↓ for history, Ctrl+C to cancel"
+export const HELP_FOOTER = 'Tip: Use Tab for autocomplete, ↑↓ for history, Ctrl+C to cancel'

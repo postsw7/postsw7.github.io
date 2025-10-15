@@ -80,12 +80,12 @@ export function Banner() {
         Type <span className="text-[#44D39F]">&apos;help&apos;</span> to explore
       </div>
       <div className="mt-1 text-center text-sm text-gray-400">
-        Or type <span className="text-[#44D39F]">&apos;show recruiter&apos;</span> for a quick intro
+        Or type <span className="text-[#44D39F]">&apos;whoami&apos;</span> to see who I am
       </div>
       <div className="mt-1 text-center text-sm text-gray-400">
         In a hurry? Just click my{' '}
         <a
-          className="underline hover:text-[#44D39F]"
+          className="text-[#44D39F] hover:underline"
           href={RESUME_URL}
           target="_blank"
           rel="noreferrer noopener"
@@ -94,7 +94,7 @@ export function Banner() {
         </a>{' '}
         or{' '}
         <a
-          className="underline hover:text-[#44D39F]"
+          className="text-[#44D39F] hover:underline"
           href={LINK_ALIASES.linkedin}
           target="_blank"
           rel="noreferrer noopener"
