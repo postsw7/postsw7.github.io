@@ -16,15 +16,16 @@ export interface RecruiterData {
 
 export const RECRUITER: RecruiterData = {
   name: 'Siwoo Lee — Software Engineer',
-  location: 'Toronto, ON, Canada',
-  experience: '7+ years experience',
-  tagline: 'Full-stack engineer • AWS Cloud & DevOps automation',
+  location: 'Seoul, South Korea (open to relocation) • Canadian citizen',
+  experience: '9 years of experience',
+  tagline: 'AWS infrastructure • CI/CD automation • Production reliability',
   highlights: [
-    'Led org-wide security infrastructure overhaul; integrated AWS Identity Center for unified auth.',
-    'Modernized CI/CD with GitHub Actions & ECS; maintained legacy Ansible automation sustainably.',
-    'Migrated legacy S3/SES integrations to AWS SDK with IAM-based auth.',
-    'Developed Strapi-based CMS (Aurora MySQL, Docker, DeepL) — enabled non-dev updates 7× faster.',
-    'Built & launched full-featured e-commerce web app (React, Redux, JS) as the sole front-end engineer.',
+    'Replaced all standing AWS credentials with OIDC for every GitHub Actions workflow, per-service IAM roles, and AWS Identity Center.',
+    'Drove Terraform adoption from legacy Ansible with a dedicated infrastructure repo and CI checks for provider versioning.',
+    'Rebuilt production deploys as one GitHub Actions pipeline that releases the frontend only after the API is live.',
+    'Built a Redis-backed distributed circuit breaker to reroute chat traffic from unhealthy AI providers across ECS tasks.',
+    'Traced stuck export tasks to zombie Chromium processes under a non-init PID 1 and fixed it at the container level.',
+    'Led security incident response from anomalous CloudTrail activity; added real-time detection with EventBridge, GuardDuty, and PagerDuty.',
   ],
   links: [
     { label: 'Resume', url: RESUME_URL, type: 'resume' },

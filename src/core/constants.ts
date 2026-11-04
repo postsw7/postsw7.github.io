@@ -12,7 +12,7 @@ export interface DemoSpec {
 }
 
 export const RESUME_URL: string =
-  'https://drive.google.com/file/d/1EFuRm4YJsGxEkVarX2jsISmjD3otkJA3/view'
+  'https://drive.google.com/file/d/1OUs9tj3a8xnCxUUup6ocWKzBL8TrJiRl/view?usp=sharing'
 
 export const LINK_ALIASES: LinkAliases = {
   github: 'https://github.com/postsw7',
