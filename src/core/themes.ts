@@ -26,7 +26,7 @@ export const THEMES: Record<string, Theme> = {
     link: 'text-[#4285f4]',
     error: 'text-[#e75448]',
     caret: 'bg-[#ffffff]',
-  prompt: 'USE_STRINGS_PROMPT',
+    prompt: 'USE_STRINGS_PROMPT',
   },
   light: {
     name: 'Light',
@@ -40,10 +40,16 @@ export const THEMES: Record<string, Theme> = {
     link: 'text-blue-500',
     error: 'text-red-600',
     caret: 'bg-gray-900',
-  prompt: 'USE_STRINGS_PROMPT',
+    prompt: 'USE_STRINGS_PROMPT',
   },
 }
 
-export function getTheme(key: string): Theme { return THEMES[key] || THEMES.dark }
-export function getThemeKeys(): string[] { return Object.keys(THEMES) }
-export function isValidTheme(key: string): boolean { return key in THEMES }
+export function getTheme(key: string): Theme {
+  return THEMES[key] || THEMES.dark
+}
+export function getThemeKeys(): string[] {
+  return Object.keys(THEMES)
+}
+export function isValidTheme(key: string): boolean {
+  return key in THEMES
+}

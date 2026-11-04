@@ -1,6 +1,10 @@
 import { RESUME_URL, LINK_ALIASES } from './constants'
 
-export interface RecruiterLink { label: string; url: string; type: 'resume' | 'linkedin' | 'github' | 'email' }
+export interface RecruiterLink {
+  label: string
+  url: string
+  type: 'resume' | 'linkedin' | 'github' | 'email'
+}
 export interface RecruiterData {
   name: string
   location: string

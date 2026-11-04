@@ -12,7 +12,7 @@
   --highlight: #fff292;
 }
 
-[data-theme="light"] {
+[data-theme='light'] {
   --fg: #111827; /* gray-900 */
   --prompt-bg: #e5e7eb; /* gray-200 */
   --prompt-tri: #e5e7eb;
@@ -24,13 +24,31 @@
   --highlight: #d97706; /* amber-600 for light theme */
 }
 
-.text-fg { color: var(--fg); }
-.bg-prompt { background-color: var(--prompt-bg); }
-.bg-app { background-color: var(--app-bg); }
-.bg-terminal { background-color: var(--terminal-bg); }
-.bg-header { background-color: var(--header-bg); }
-.text-error { color: var(--error); }
-.text-accent { color: var(--accent); }
-.hover\:text-accent:hover { color: var(--accent); }
-.text-highlight { color: var(--highlight); }
+.text-fg {
+  color: var(--fg);
+}
+.bg-prompt {
+  background-color: var(--prompt-bg);
+}
+.bg-app {
+  background-color: var(--app-bg);
+}
+.bg-terminal {
+  background-color: var(--terminal-bg);
+}
+.bg-header {
+  background-color: var(--header-bg);
+}
+.text-error {
+  color: var(--error);
+}
+.text-accent {
+  color: var(--accent);
+}
+.hover\:text-accent:hover {
+  color: var(--accent);
+}
+.text-highlight {
+  color: var(--highlight);
+}
 /* Triangles use inline style border color var(--prompt-tri) */

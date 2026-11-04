@@ -10,7 +10,7 @@ export interface API {
 
 export type CommandHandler = (
   args: string[],
-  api: API
+  api: API,
 ) => Promise<CLIOutput | void> | CLIOutput | void
 
 export interface CommandSpec {
