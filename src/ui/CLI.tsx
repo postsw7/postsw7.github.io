@@ -4,7 +4,7 @@
 import React, { useState, useEffect, useRef, KeyboardEvent } from 'react'
 
 import { createRegistry } from '../commands/registry'
-import { trackVisit, trackCommand, trackUnknownCommand, trackDemoError } from '../core/analytics'
+import { trackVisit, trackCommand, trackUnknownCommand } from '../core/analytics'
 import { STRINGS, buildPrompt, rootPrompt } from '../core/strings'
 import { tokenize, hasTrailingSpace } from '../core/tokenize'
 import {
@@ -16,7 +16,6 @@ import {
   isDir,
   pathLabel,
 } from '../core/vfs'
-import { runJgrep, isJgrepReady } from '../external/jgrepWorkerClient'
 
 import { getCompletionCandidates, applyCompletion } from './autocomplete'
 import { ActivePrompt } from './components/ActivePrompt'
@@ -69,8 +68,6 @@ export function CLI(): JSX.Element {
   const [output, setOutput] = useState<LineItem[]>([])
   const [suggestions, setSuggestions] = useState<SuggestionState | null>(null)
   const [activeStatus, setActiveStatus] = useState<Status>('ok')
-  // Inline jgrep spinner state (replaces itself with result once loaded)
-  const [jgrepSpinner, setJgrepSpinner] = useState<{ id: string; start: number } | null>(null)
   const inputRef = useRef<HTMLInputElement | null>(null)
   const outputEndRef = useRef<HTMLDivElement | null>(null)
   const scrollRef = useRef<HTMLDivElement | null>(null)
@@ -151,31 +148,6 @@ export function CLI(): JSX.Element {
     },
   }
   const commands = createRegistry(api, rootPrompt())
-
-  // Animate spinner if active (first-time runtime load only)
-  useEffect(() => {
-    if (!jgrepSpinner) return
-    const frames = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏']
-    let idx = 0
-    const id = setInterval(() => {
-      idx = (idx + 1) % frames.length
-      const frameChar = frames[idx]
-      setOutput((prev) =>
-        prev.map((line) =>
-          line.id === jgrepSpinner.id
-            ? {
-                ...line,
-                type: 'info',
-                content: (
-                  <span className="text-gray-400">{frameChar} loading jgrep runtime...</span>
-                ),
-              }
-            : line,
-        ),
-      )
-    }, 90)
-    return () => clearInterval(id)
-  }, [jgrepSpinner])
 
   // Overloads for stronger type inference
   function addOutput(item: Omit<CommandItem, 'id'>): string
@@ -441,135 +413,6 @@ export function CLI(): JSX.Element {
       addOutput({ type: 'output', content: <pre className="whitespace-pre-wrap">{content}</pre> })
       finalizeCommand(commandId, 'ok')
       return 'ok'
-    }
-
-    // External jgrep command passthrough
-    if (cmdName === 'jgrep') {
-      const ready = isJgrepReady()
-      const buildNodeFromResult = (result: any) => {
-        if (result.format === 'lines') {
-          const text = result.lines.length ? result.lines.join('\n') : '(no matches)'
-          return <pre className="whitespace-pre-wrap">{text}</pre>
-        } else if (result.format === 'pretty') {
-          return <pre className="whitespace-pre">{result.blocks.join('\n')}</pre>
-        } else if (result.format === 'table') {
-          const widths = result.header.map((h: string, i: number) =>
-            Math.max(h.length, ...result.rows.map((r: string[]) => (r[i] || '').length)),
-          )
-          const pad = (v: string, i: number) => v + ' '.repeat(widths[i] - v.length)
-          const linesTxt = [
-            result.header.map(pad).join('  '),
-            ...result.rows.map((r: string[]) => r.map(pad).join('  ')),
-          ]
-          return <pre className="whitespace-pre">{linesTxt.join('\n')}</pre>
-        } else if (result.format === 'tokens') {
-          return (
-            <div className="space-y-1">
-              {result.lines.map((ln: any, idx: number) => (
-                <div key={idx} className="whitespace-pre-wrap">
-                  {ln.map((tok: any, i: number) => {
-                    const base = 'font-mono'
-                    let cls = ''
-                    switch (tok.t) {
-                      case 'match':
-                        cls = 'text-[#ffa198] font-semibold'
-                        break
-                      case 'key':
-                        cls = 'text-gray-400'
-                        break
-                      case 'value':
-                        cls = 'text-gray-400'
-                        break
-                      case 'number':
-                        cls = 'text-amber-300'
-                        break
-                      case 'string':
-                        cls = 'text-gray-400'
-                        break
-                      default:
-                        cls = 'text-gray-400'
-                        break
-                    }
-                    return (
-                      <span key={i} className={`${base} ${cls}`}>
-                        {tok.v}
-                      </span>
-                    )
-                  })}
-                </div>
-              ))}
-            </div>
-          )
-        }
-        return <pre className="whitespace-pre-wrap">(unknown format)</pre>
-      }
-
-      if (ready) {
-        try {
-          const result = await runJgrep([cmdName, ...args])
-          addOutput({ type: 'output', content: buildNodeFromResult(result) })
-          finalizeCommand(commandId, 'ok')
-          return 'ok'
-        } catch (err: any) {
-          trackDemoError('jgrep', err?.message || 'unknown')
-          addOutput({ type: 'error', content: err?.message || 'jgrep: error: unknown failure' })
-          finalizeCommand(commandId, 'err')
-          return 'err'
-        }
-      }
-
-      // Not ready yet: show first-load spinner with enforced delay
-      const spinnerStart = Date.now()
-      const spinnerId = addOutput({
-        type: 'info',
-        content: <span className="text-gray-400">⠋ loading jgrep runtime...</span>,
-      })
-      setJgrepSpinner({ id: spinnerId, start: spinnerStart })
-      const MIN_SPINNER_MS = 2000
-      const deferUntilMin = (fn: () => void) => {
-        const elapsed = Date.now() - spinnerStart
-        const remaining = MIN_SPINNER_MS - elapsed
-        if (remaining > 0) {
-          setTimeout(fn, remaining)
-        } else {
-          fn()
-        }
-      }
-      try {
-        const result = await runJgrep([cmdName, ...args])
-        const replace = () => {
-          setOutput((prev) =>
-            prev.map((line) =>
-              line.id === spinnerId
-                ? { ...line, type: 'output', content: buildNodeFromResult(result) }
-                : line,
-            ),
-          )
-          setJgrepSpinner(null)
-          finalizeCommand(commandId, 'ok')
-        }
-        deferUntilMin(replace)
-        return 'ok'
-      } catch (err: any) {
-        trackDemoError('jgrep', err?.message || 'unknown')
-        const replaceErr = () => {
-          setOutput((prev) =>
-            prev.map((line) =>
-              line.id === spinnerId
-                ? {
-                    ...line,
-                    type: 'error',
-                    content: err?.message || 'jgrep: error: unknown failure',
-                  }
-                : line,
-            ),
-          )
-          setJgrepSpinner(null)
-          finalizeCommand(commandId, 'err')
-        }
-        deferUntilMin(replaceErr)
-        return 'err'
-      }
     }
 
     const cmd = (commands as any)[cmdName]

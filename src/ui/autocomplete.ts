@@ -94,7 +94,6 @@ export function getCompletionCandidates(
     return getPathCompletions(currentArg)
   }
   if (cmdName === 'theme') return getThemeCompletions(currentArg)
-  if (cmdName === 'run') return getRunSubcommands(tokens, trailingSpace, currentArg)
   if (cmdName === 'cd') {
     // If we just completed a directory (argument ends with '/' and a space followed it), list its subdirectories only
     if (trailingSpace && tokens.length >= 2) {
@@ -134,7 +133,7 @@ export function getCompletionCandidates(
 
 export function applyCompletion(input: string, completion: string): string {
   // If the input already ends with space, we're starting a new argument.
-  // Avoid duplicating the immediately preceding token (bug: `cd jgrep/ ` + Tab => `cd jgrep/ jgrep/`).
+  // Avoid duplicating the immediately preceding token (bug: `cd profile/ ` + Tab => `cd profile/ profile/`).
   // NOTE: First Enter after a completion is generically suppressed in CLI.tsx (suppressedAutocompleteEnterRef)
   // to avoid premature execution for both files and directories.
   if (/\s$/.test(input)) {
@@ -172,18 +171,4 @@ export function applyCompletion(input: string, completion: string): string {
 function getThemeCompletions(prefix: string) {
   const themes = ['dark', 'light']
   return themes.filter((t) => t.toLowerCase().startsWith(prefix.toLowerCase()))
-}
-
-function getRunSubcommands(tokens: string[], trailing: boolean, current: string) {
-  const subs = ['demo']
-  if (tokens.length === 1 && trailing) return subs
-  if (tokens.length === 2 && !trailing)
-    return subs.filter((s) => s.startsWith(current.toLowerCase()))
-  if (tokens.length >= 2 && tokens[1] === 'demo') {
-    const demos = ['list', 'jgrep']
-    if (tokens.length === 2 && trailing) return demos
-    if (tokens.length === 3 && !trailing)
-      return demos.filter((d) => d.startsWith(current.toLowerCase()))
-  }
-  return []
 }

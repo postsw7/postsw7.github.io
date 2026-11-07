@@ -12,11 +12,10 @@ import {
 } from 'lucide-react'
 import React from 'react'
 
-import { trackRecruiterView, trackResumeOpen, trackOpen, trackDemoStart } from '../core/analytics'
-import { RESUME_URL, LINK_ALIASES, DEMOS, JGREP_DEMO_STEPS } from '../core/constants'
+import { trackRecruiterView, trackResumeOpen, trackOpen } from '../core/analytics'
+import { RESUME_URL, LINK_ALIASES } from '../core/constants'
 import { HELP_SECTIONS, HELP_FOOTER } from '../core/helpData'
 import { RECRUITER } from '../core/recruiterData'
-import { createTutorialState, nextStep, stepsTotal, remaining } from '../external/jgrepTutorial'
 
 const FILE_ICONS: Record<string, React.ReactNode> = {
   github: <Github size={16} className="inline-block w-4 h-4 mr-1 text-gray-300" />,
@@ -104,113 +103,6 @@ export function createRegistry(api: CommandContextApi, _currentPrompt: string): 
       handler: () => {
         trackRecruiterView()
         return <RecruiterCard />
-      },
-    },
-    run: {
-      desc: 'Run demos and tests',
-      usage: 'run <demo|tests> [args...]',
-      handler: (args) => {
-        const sub = (args[0] || '').toLowerCase()
-        if (sub === 'demo') {
-          const demoName = (args[1] || '').toLowerCase()
-          if (demoName === 'list' || !demoName) {
-            return (
-              <div className="space-y-2">
-                <div className="text-accent">Available Demos:</div>
-                <div className="ml-4 space-y-1">
-                  {DEMOS.map((d) => (
-                    <div key={d.key}>
-                      • <span className="text-accent">{d.name}</span> - {d.desc}
-                    </div>
-                  ))}
-                </div>
-                <div className="text-sm text-gray-400 mt-2">Usage: run demo &lt;name&gt;</div>
-              </div>
-            )
-          }
-          if (demoName === 'jgrep') {
-            // Lazy attach tutorial state to globalThis to persist across rerenders
-            const g: any = globalThis as any
-            if (!g.__JGREP_TUTORIAL__) {
-              g.__JGREP_TUTORIAL__ = createTutorialState()
-              trackDemoStart('jgrep')
-            }
-            const state = g.__JGREP_TUTORIAL__
-            const first = state.index === -1
-            const stepInfo = first ? null : JGREP_DEMO_STEPS[state.index]
-            return (
-              <div className="space-y-3">
-                <div className="text-accent font-semibold">JSON-Grep Demo</div>
-                <div className="text-sm text-gray-300 leading-relaxed">
-                  Type the commands below manually to explore features. Use{' '}
-                  <span className="text-accent">demo next</span> to show the next suggested command.
-                </div>
-                <div className="text-xs text-gray-400">
-                  Sample file: <span className="text-accent">sample.jsonl</span> (bundled)
-                </div>
-                <div className="border border-gray-700 rounded p-3 text-sm space-y-1">
-                  {JGREP_DEMO_STEPS.map((s) => (
-                    <div key={s.idx} className="flex gap-2 items-start">
-                      <span
-                        className={`w-6 text-right ${state.index >= s.idx ? 'text-accent' : 'text-gray-500'}`}
-                      >
-                        {s.idx + 1}.
-                      </span>
-                      <div>
-                        <div className="text-gray-200">
-                          <span className="text-accent">{s.title}</span>
-                        </div>
-                        <div className="text-gray-400">{s.command}</div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                {first && (
-                  <div className="text-xs text-gray-400">
-                    Start with step 1: type{' '}
-                    <span className="text-accent">{JGREP_DEMO_STEPS[0].command}</span>
-                  </div>
-                )}
-                {!first && stepInfo && (
-                  <div className="text-xs text-gray-400">
-                    Current step: <span className="text-accent">{stepInfo.title}</span>. Remaining:{' '}
-                    {remaining(state)}
-                  </div>
-                )}
-                {state.done && (
-                  <div className="text-xs text-accent">
-                    Tutorial complete — experiment freely with jgrep!
-                  </div>
-                )}
-              </div>
-            )
-          }
-          return `Unknown demo: ${demoName}. Try: run demo list`
-        }
-        return 'Usage: run demo <name>'
-      },
-    },
-    demo: {
-      desc: 'Helper for active demo session (demo next)',
-      usage: 'demo next',
-      handler: (args) => {
-        const sub = (args[0] || '').toLowerCase()
-        if (sub !== 'next') return 'Usage: demo next'
-        const g: any = globalThis as any
-        if (!g.__JGREP_TUTORIAL__) return 'No active demo. Start one: run demo jgrep'
-        const info = nextStep(g.__JGREP_TUTORIAL__)
-        if (!info) return 'No more steps. Tutorial complete.'
-        return (
-          <div className="space-y-1 text-sm">
-            <div className="text-accent">
-              Step {g.__JGREP_TUTORIAL__.index + 1}/{stepsTotal()}: {info.title}
-            </div>
-            <div className="text-gray-300">{info.blurb}</div>
-            <div className="text-gray-400">
-              Command: <span className="text-accent">{info.stepText}</span>
-            </div>
-          </div>
-        )
       },
     },
     resume: {

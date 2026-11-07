@@ -36,13 +36,6 @@ export const HELP_SECTIONS: HelpSection[] = [
       { cmd: 'theme <dark|light>', desc: 'Change theme (dark or light)' },
     ],
   },
-  {
-    title: 'Projects',
-    items: [
-      { cmd: 'run demo list', desc: 'List available demos' },
-      { cmd: 'cd projects/jgrep', desc: 'Navigate to JSON-Grep project' },
-    ],
-  },
 ]
 
 export const HELP_FOOTER = 'Tip: Use Tab for autocomplete, ↑↓ for history, Ctrl+C to cancel'

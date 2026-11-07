@@ -32,7 +32,6 @@ module.exports = {
     'dist/',
     '.vite/',
     'node_modules/',
-    'public/jgrep/',
     'v1/',
   ],
   overrides: [

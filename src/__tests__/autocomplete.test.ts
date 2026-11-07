@@ -1,6 +1,11 @@
-import { describe, it, expect, beforeEach } from 'vitest'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
 
 import { getCompletionCandidates, applyCompletion } from '../ui/autocomplete'
+
+vi.mock('../core/vfs', async (importOriginal) => {
+  const { withSampleProjects } = await import('./vfsFixture')
+  return withSampleProjects(await importOriginal<typeof import('../core/vfs')>())
+})
 
 // Minimal registry for testing (handlers unused)
 interface TestCmd {
@@ -16,7 +21,6 @@ const registry: Record<string, TestCmd> = {
   cat: { desc: '', handler: () => {} },
   open: { desc: '', handler: () => {} },
   theme: { desc: '', handler: () => {} },
-  run: { desc: '', handler: () => {} },
   show: { desc: '', handler: () => {} },
 }
 
@@ -97,13 +101,13 @@ describe('autocomplete (commands + VFS)', () => {
     expect(result).toMatch(/^cat profile\/about\.md/) // anchored
   })
 
-  it('applyCompletion prefixes nested project path (cat projects/ + jgrep/)', () => {
-    const result = applyCompletion('cat projects/', 'jgrep/')
-    expect(result).toMatch(/^cat projects\/jgrep\//)
+  it('applyCompletion prefixes nested project path (cat projects/ + sample/)', () => {
+    const result = applyCompletion('cat projects/', 'sample/')
+    expect(result).toMatch(/^cat projects\/sample\//)
   })
 
-  it('cat projects/jgrep/README.md <space> has no further completions', () => {
-    const cands = getCompletionCandidates(['cat', 'projects/jgrep/README.md'], true, registry)
+  it('cat projects/sample/README.md <space> has no further completions', () => {
+    const cands = getCompletionCandidates(['cat', 'projects/sample/README.md'], true, registry)
     expect(cands).toEqual([])
   })
 

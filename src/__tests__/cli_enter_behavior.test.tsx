@@ -1,10 +1,15 @@
 import userEvent from '@testing-library/user-event'
 import React from 'react'
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 
 import { CLI } from '../ui/CLI'
 
 import { render, screen } from './utils'
+
+vi.mock('../core/vfs', async (importOriginal) => {
+  const { withSampleProjects } = await import('./vfsFixture')
+  return withSampleProjects(await importOriginal<typeof import('../core/vfs')>())
+})
 
 // These tests focus on interaction semantics around autocomplete + Enter.
 // We rely on the in-memory VFS defined in vfs.ts.
@@ -42,21 +47,21 @@ describe('CLI Enter + autocomplete behavior', () => {
     await typeAndTab(input, 'cat pro')
 
     await pressEnter() // swallow
-    expect(screen.queryByText(/JSON-Grep/)).not.toBeInTheDocument()
+    expect(screen.queryByText(/Sample Project/)).not.toBeInTheDocument()
     expect(screen.queryByText(/usage: cat/)).not.toBeInTheDocument()
 
     if (input.value.includes('profile/')) {
       await userEvent.type(input, 'a')
       await userEvent.keyboard('{Tab}')
     } else if (input.value.includes('projects/')) {
-      await userEvent.type(input, 'jgrep/README')
+      await userEvent.type(input, 'sample/README')
       await userEvent.keyboard('{Tab}')
     }
 
     await pressEnter()
     const about = screen.queryByText(/Siwoo Lee/)
-    const jgrep = screen.queryByText(/JSON-Friendly Grep/)
-    expect(about ?? jgrep).toBeInTheDocument()
+    const sample = screen.queryByText(/Sample Project/)
+    expect(about ?? sample).toBeInTheDocument()
   })
 
   it('multi-candidate directory token cat profile/ — first Enter confirm, second Enter error (cannot cat dir)', async () => {

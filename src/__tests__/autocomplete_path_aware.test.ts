@@ -1,6 +1,11 @@
-import { describe, it, expect, beforeEach } from 'vitest'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
 
 import { getCompletionCandidates, applyCompletion } from '../ui/autocomplete'
+
+vi.mock('../core/vfs', async (importOriginal) => {
+  const { withSampleProjects } = await import('./vfsFixture')
+  return withSampleProjects(await importOriginal<typeof import('../core/vfs')>())
+})
 
 interface TestCmd {
   desc: string
